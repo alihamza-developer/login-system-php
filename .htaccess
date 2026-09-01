@@ -3,3 +3,13 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
 RewriteRule ^robots.txt robots.php [NC,L]
+RewriteRule ^(?!(temp|admin|api|sw.php|includes|manifest.json|css|js|images|robots|controllers|action|test|order-files|uploads|user|my|source|webhook|sitemap.xml|sw.js|manager|electron)(\/?)+).*$ index.php [L]
+
+# Restrict access to specific directories
+RewriteRule ^user/includes(.*)$ - [F,L]
+RewriteRule ^user/components(.*)$ - [F,L]
+RewriteRule ^admin/components(.*)$ - [F,L]
+RewriteRule ^admin/includes(.*)$ - [F,L]
+
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\sessions
