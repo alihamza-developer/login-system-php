@@ -46,6 +46,16 @@ $ASSETS_TEPLATES_ = [
             url('js/tinymce/tinymce.min.js'),
         ]
     ],
+    'dashboard' => [
+        'css' => [
+            url('css/dashboard/index.css'),
+            url('css/dashboard/sidebar.css'),
+            url('css/dashboard/navbar.css'),
+        ],
+        'js' => [
+            url('js/dashboard/sidebar.js'),
+        ]
+    ]
 ];
 
 

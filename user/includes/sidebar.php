@@ -1,3 +1,23 @@
+<?php
+
+
+# Sidebar options for user
+define('SIDEBAR_OPTIONS_USER', [
+    [
+        'title' => "Dashboard",
+        'description' => "View all the statistics and reports",
+        'icon' => 'th-large',
+        'url' => 'dashboard',
+    ],
+    [
+        'title' => "Profile Setting",
+        'description' => "Manage your profile settings",
+        'icon' => 'user-cog',
+        'url' => _DIR_ . 'user/setting',
+    ],
+]);
+?>
+
 <div class="sidebar">
     <div class="user-info text-center">
         <div class="user-image-container">

@@ -1,63 +1,28 @@
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tbody>
-        <tr>
-            <td bgcolor="#eeeeee" align="center" style="padding:30px 15px">
-                <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="100%"
-                    style="max-width:600px;padding:0px">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                    <tbody>
-                                        <tr>
-                                            <td align="center">
-                                                <a href="{{SITE_URL}}" style="text-decoration:none" target="_blank">
-                                                    <h2
-                                                        style="font-family:sans-serif;text-align:center;color:#ffffff;background:#1076F7;margin:0;padding:30px;font-size:25px">
-                                                        {{SITE_NAME}}</h2>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td
-                                                style="font-size:14px;color:#333;font-family:sans-serif;line-height:18px;vertical-align:top;padding:40px 20px 25px">
-                                                <p>You Recieved a new message from <a
-                                                        href="{{SITE_URL}}">{{SITE_NAME}}</a> </p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td
-                                                style="font:16px/22px 'Helvetica Neue',Arial,'sans-serif';text-align:left;color:#555555;padding:0px 40px 40px 20px">
-                                                <table width="100%" border="0" cellspacing="0" cellpadding="0"
-                                                    style="margin: 0">
-                                                    <tbody>
-                                                        <tr>
-                                                            <td><b>Name:</b></td>
-                                                            <td>{{NAME}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><b>Email:</b></td>
-                                                            <td>{{EMAIL}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><b>Subject:</b></td>
-                                                            <td>{{SUBJECT}}</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><b>Message:</b></td>
-                                                            <td>{{MESSAGE}}</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-    </tbody>
+<h1 style="margin:0 0 12px; font-size:21px; font-weight:bold; color:#16181d;">New contact message</h1>
+
+<p style="margin:0 0 20px; font-size:15px; line-height:1.6; color:#4b5563;">
+    Someone submitted the contact form on {{site_name}}.
+</p>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px; border:1px solid #e4e6eb; border-radius:10px;">
+    <tr>
+        <td style="padding:12px 16px; border-bottom:1px solid #e4e6eb; font-size:13px; color:#6b7280; width:90px;">Name</td>
+        <td style="padding:12px 16px; border-bottom:1px solid #e4e6eb; font-size:14px; color:#16181d;">{{name}}</td>
+    </tr>
+    <tr>
+        <td style="padding:12px 16px; border-bottom:1px solid #e4e6eb; font-size:13px; color:#6b7280;">Email</td>
+        <td style="padding:12px 16px; border-bottom:1px solid #e4e6eb; font-size:14px;">
+            <a href="mailto:{{email}}" style="color:#0f766e; text-decoration:none;">{{email}}</a>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:12px 16px; font-size:13px; color:#6b7280;">Subject</td>
+        <td style="padding:12px 16px; font-size:14px; color:#16181d;">{{subject}}</td>
+    </tr>
 </table>
+
+<p style="margin:0 0 8px; font-size:13px; font-weight:bold; color:#6b7280;">Message</p>
+
+<div style="padding:16px; background:#fafbfc; border:1px solid #e4e6eb; border-radius:10px; font-size:14px; line-height:1.6; color:#16181d;">
+    {{message}}
+</div>

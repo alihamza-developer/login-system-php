@@ -1,30 +1,18 @@
 <?php
-$page_name = "404";
+http_response_code(404);
+$page_name = "Page not found";
 
-$CSS_FILES_ = ['404.css'];
+$CSS_FILES_[] = '404.css';
 include_once "includes/head.php";
 ?>
-<section class="page_404">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 ">
-                <div class="col-sm-10 offset-sm-1  text-center">
-                    <div class="four_zero_four_bg">
-                        <h1 class="text-center ">404</h1>
-                    </div>
-
-                    <div class="contant_box_404">
-                        <h3 class="h2">
-                            Look like you're lost
-                        </h3>
-
-                        <p> The page you are looking for might havbe been moved, renamed or might never existed.</p>
-
-                        <a href="<?= SITE_URL ?>" class="link_404">Go to Home</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="error-page">
+    <div class="error-card">
+        <span class="error-code">404</span>
+        <h1 class="error-heading">Page not found</h1>
+        <p class="error-text">
+            The page you're looking for may have been moved, renamed, or never existed.
+        </p>
+        <a href="<?= SITE_URL ?>" class="btn btn-primary">Go to home</a>
     </div>
-</section>
+</div>
 <?php require_once("includes/foot.php") ?>

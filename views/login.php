@@ -2,9 +2,10 @@
 $VERIFY_LOGIN = true;
 $page_name = 'Login';
 require_once "includes/db.php";
+$CSS_FILES_[] = 'authorize.css';
 require_once "includes/head.php";
 
-// Verify User
+# Verify User
 if (isset($_GET['verify']) && isset($_GET['token']) && isset($_GET['email'])) {
     $token = $_GET['token'];
     $email = $_GET['email'];
@@ -17,41 +18,42 @@ if (isset($_GET['success'])) {
     $SCRIPT_ = 'sAlert("' . $_GET['success'] . '", "Congratulations")';
 }
 ?>
-<div class="main-login-container">
-    <div class="col-md-5 login-container">
-        <form action="authorize" method="POST" class="js-form own-target w-100">
-            <div class="content-center flex-column">
-                <h2 class="heading ">Sign In to <?= SITE_NAME ?></h2>
-                <p class="more mb-4">OR Use email account</p>
-            </div>
+<div class="authorize-page">
+    <div class="auth-card">
 
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-text"><?= svg_icon("mail")  ?></span>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
-                    </div>
+        <div class="auth-brand">
+            <span class="brand-mark"><?= strtoupper(substr(SITE_NAME, 0, 1)) ?></span>
+            <span class="brand-name"><?= SITE_NAME ?></span>
+        </div>
+
+        <h1 class="auth-heading">Welcome back</h1>
+        <p class="auth-sub">Sign in to continue to your account.</p>
+
+        <form action="authorize" method="POST" class="js-form own-target">
+
+            <div class="auth-field form-group">
+                <label class="field-label" for="email">Email address</label>
+                <div class="input-group">
+                    <span class="input-group-text"><?= svg_icon("mail") ?></span>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" autocomplete="email" required autofocus>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="input-group-text"><?= svg_icon("lock")  ?></span>
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
-                    </div>
-                    <p class="text-right mt-2">
-                        <a href="forgot">Forgot Password?</a>
-                    </p>
+
+            <div class="auth-field form-group">
+                <label class="field-label" for="password">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><?= svg_icon("lock") ?></span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Your password" autocomplete="current-password" required>
                 </div>
-            </div>
-            <div class="col-md-12 content-center flex-column">
-                <input type="hidden" name="login" value="true">
-                <button class="register btn w-100 mt-2 py-2" type="submit">Login</button>
-                <p class="more my-1 mt-4">OR</p>
-                <p class="more">Don't you have an account? <a href="register">Sign Up</a></p>
+                <span class="field-hint"><a href="forgot">Forgot password?</a></span>
             </div>
 
+            <input type="hidden" name="login" value="true">
+            <button type="submit" class="auth-submit">Sign in</button>
         </form>
+
+        <p class="auth-foot">Don't have an account? <a href="register">Create one</a></p>
+
     </div>
 </div>
 <?php require_once "includes/foot.php" ?>

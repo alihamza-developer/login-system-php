@@ -55,8 +55,8 @@ class Emails extends Database
             $var = strtolower($var);
             if (!$is_email_body)
                 $value = replaceBreaksToBr($value);
-            $var = "_:" . $var . ":_";
-            $str = str_replace($var, $value, $str);
+            # templates and admin ui use {{var}}
+            $str = str_ireplace("{{" . $var . "}}", $value, $str);
         }
         return $str;
     }
@@ -125,6 +125,7 @@ class Emails extends Database
                 'login_url' => merge_path(SITE_URL, "login"),
                 'site_email' => CONTACT_EMAIL,
                 'site_logo_url' => url('images/logo-with-name.png?v=1.0'),
+                'site_initial' => strtoupper(substr(SITE_NAME, 0, 1)),
             ]);
             // User Data
             $user = $this->db->select_one("users", '*', ['email' => $to]);

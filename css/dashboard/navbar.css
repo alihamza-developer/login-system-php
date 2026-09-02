@@ -1,0 +1,133 @@
+/* #region Navbar */
+
+.navbar {
+    background: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 70px;
+    width: 100%;
+    z-index: 99;
+    padding: 10px 20px;
+    padding-left: 320px;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.navbar.full-width {
+    padding-left: 20px;
+}
+
+.navbar .page-name {
+    font-size: 20px;
+    color: #777;
+    font-family: var(--fontFamily);
+    font-weight: normal;
+}
+
+.navbar .menu {
+    flex: 1;
+    display: flex;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    -webkit-align-items: center;
+    align-items: center;
+}
+
+.navbar .menu-item {
+    background: none;
+    font-size: 16px;
+    color: #777;
+    border: none;
+    cursor: pointer;
+}
+
+.navbar .menu-item img {
+    width: 35px;
+    height: 35px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.dropdown-menu {
+    right: 0;
+    left: auto;
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 2px 20px #0001;
+}
+
+@keyframes fadeTop {
+    from {
+        -webkit-transform: translateY(-10px);
+        -moz-transform: translateY(-10px);
+        -ms-transform: translateY(-10px);
+        -o-transform: translateY(-10px);
+        transform: translateY(-10px);
+    }
+
+    to {
+        -webkit-transform: translateY(0px);
+        -moz-transform: translateY(0px);
+        -ms-transform: translateY(0px);
+        -o-transform: translateY(0px);
+        transform: translateY(0px);
+    }
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background: #e9ecef;
+    color: #212529 !important;
+}
+
+.dropdown-menu .dropdown-item {
+    display: flex;
+    padding: 8px 15px;
+    align-items: center;
+}
+
+.dropdown-menu .dropdown-item svg {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.dropdown-menu .dropdown-item .text {
+    margin-left: 10px;
+}
+
+.dropdown-toggle.no-arrow-icon::after {
+    content: none !important;
+}
+
+/*----------------------
+    Top NavBar End
+-----------------------*/
+.user-img {
+    object-fit: cover;
+}
+
+
+
+/* #endregion Navbar */
+
+/* #region Overrides */
+
+.navbar:not(.full-width) {
+    padding: 10px 30px;
+    width: calc(100vw - var(--sidebarWidth));
+    left: var(--sidebarWidth);
+    height: auto;
+}
+
+.navbar .page-name {
+    font-size: 17px;
+}
+
+/* #endregion Overrides */

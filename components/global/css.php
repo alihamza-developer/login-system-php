@@ -3,6 +3,7 @@ assets_file([
     'Libraries/font-awesome.min.css',
     'Libraries/bootstrap.min.css',
     'custom.css',
+    'styles.css',
     'components/Toaster.css',
     'components/Dialog.css',
 ], 'css', _DIR_ . "css");

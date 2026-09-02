@@ -97,6 +97,7 @@ if (isset($_POST['reset_password'])) {
 	$variables = ['token', 'email', 'new_password', 'confirm_password'];
 	foreach ($variables as $value) {
 		if (!isset($_POST[$value])) {
+			echo error('Something is missing from that request. Please open the reset link again.');
 			die();
 		}
 	}
@@ -104,29 +105,48 @@ if (isset($_POST['reset_password'])) {
 	$email = $_POST['email'];
 	$new_password = $_POST['new_password'];
 	$confirm_password = $_POST['confirm_password'];
+
+	$invalid_link = 'That reset link is invalid or has expired. Please request a new one.';
+
 	$user = $db->select_one('users', '*', ['email' => $email]);
-	if ($user) {
-		if ($token == $user['password_forgot_token']) {
-			$expiry_date = $user['token_expiry_date'];
-			$expiry_date = date("Y-m-d h:i:s", strtotime($expiry_date));
-			$current_date = date("Y-m-d h:i:s");
-			if ($current_date < $expiry_date) {
-				if ($new_password === $confirm_password) {
-					$password = password_hash($new_password, PASSWORD_BCRYPT);
-					$expiry_date = date('Y-m-d h:i:s', strtotime(date('Y-m-d h:i:s') . " -3 days"));
-					$update = $db->update('users', [
-						'password' => $password,
-						'token_expiry_date' => $expiry_date,
-					], ['id' => $user['id']]);
-					if ($update) {
-						echo success("Password changed successfully", [
-							'redirect' => 'login?success=Password changed successfully'
-						]);
-					}
-				} else {
-					echo error('Password is not matching');
-				}
-			}
-		}
+	if (!$user) {
+		echo error($invalid_link);
+		die();
 	}
+
+	# Token must match
+	if (!hash_equals((string) $user['password_forgot_token'], (string) $token)) {
+		echo error($invalid_link);
+		die();
+	}
+
+	# Token must not be expired
+	$expiry_date = date("Y-m-d H:i:s", strtotime($user['token_expiry_date']));
+	$current_date = date("Y-m-d H:i:s");
+	if ($current_date >= $expiry_date) {
+		echo error($invalid_link);
+		die();
+	}
+
+	if ($new_password !== $confirm_password) {
+		echo error('Password is not matching');
+		die();
+	}
+
+	$password = password_hash($new_password, PASSWORD_BCRYPT);
+	$expiry_date = date('Y-m-d H:i:s', strtotime("-3 days"));
+	$update = $db->update('users', [
+		'password' => $password,
+		'token_expiry_date' => $expiry_date,
+	], ['id' => $user['id']]);
+
+	if (!$update) {
+		echo error('We could not change your password. Please try again.');
+		die();
+	}
+
+	echo success("Password changed successfully", [
+		'redirect' => 'login?success=Password changed successfully'
+	]);
+	die();
 }

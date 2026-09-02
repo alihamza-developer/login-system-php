@@ -1,57 +1,30 @@
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<h1 style="margin:0 0 12px; font-size:21px; font-weight:bold; color:#16181d;">Reset your password</h1>
+
+<p style="margin:0 0 18px; font-size:15px; line-height:1.6; color:#4b5563;">
+    Hi {{user_firstname}}, we received a request to reset the password for your
+    {{site_name}} account. Choose a new one using the button below.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;">
     <tr>
-        <td style="padding: 10px 0 30px 0;">
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600"
-                style="border: 1px solid #cccccc; border-collapse: collapse;">
-                <tr>
-                    <td align="center" bgcolor="#007bff"
-                        style="padding: 40px 0 30px 0; color: #ffffff; font-size: 28px; font-weight: bold; font-family: Arial, sans-serif;">
-                        <a href="{{SITE_URL}}" style="text-decoration: none;color: #ffffff;">{{SITE_NAME}}</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;"> <b>We
-                                        received a request to reset the password for your account.</b> </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-                                    We received a request to reset the password for your account. If you did not
-                                    make this request, please <a href="{{SITE_URL}}/contact"
-                                        style="font-family: sans-serif;text-decoration: none;">let us know</a>. If
-                                    you requested a reset for the account associated with {{TO}}, click the
-                                    button below to reset your account password. </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 20px 0 20px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;text-align: center;"
-                                    align="center"> <a href="{{SITE_URL}}/forgot?reset=1&token={{TOKEN}}&email={{TO}}"
-                                        bgcolor="#5191fa"
-                                        style="text-align:center;background:#0DA3D6;color:#fff;text-decoration:none;padding:15px 20px;display:inline-block;">
-                                        Reset Password </a> </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 20px 0 20px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-                                    A password reset request can be made by anyone, and while it does not indicate
-                                    that your account is in any danger of being accessed by someone else, we do
-                                    recommend that you ensure that you are using a secure and unique password to
-                                    protect your {{SITE_NAME}} account. We also suggest using a different
-                                    password for every online account that you have. </td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 20px 0 20px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-                                    If you have any questions, please <a href="{{SITE_URL}}/contact"
-                                        style="font-family: sans-serif;text-decoration: none;">contact us</a>. Thank
-                                    you for using {{SITE_NAME}}. </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+        <td style="background:#0f766e; border-radius:10px;">
+            <a href="{{site_url}}/forgot?reset=1&token={{token}}&email={{to}}"
+                style="display:inline-block; padding:13px 26px; font-size:15px; font-weight:bold; color:#ffffff; text-decoration:none;">
+                Reset password
+            </a>
         </td>
     </tr>
 </table>
+
+<p style="margin:0 0 14px; font-size:13px; color:#6b7280;">
+    This link is valid for 24 hours and can only be used once.
+    Your password stays the same until you choose a new one.
+</p>
+
+<p style="margin:0 0 6px; font-size:13px; color:#6b7280;">
+    If the button doesn't work, paste this into your browser:
+</p>
+
+<p style="margin:0; font-size:12px; line-height:1.5; color:#0f766e; word-break:break-all;">
+    {{site_url}}/forgot?reset=1&token={{token}}&email={{to}}
+</p>

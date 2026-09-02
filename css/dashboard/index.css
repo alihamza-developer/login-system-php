@@ -1,0 +1,18 @@
+/* #region Dashboard Layout */
+
+:root {
+    --sidebarWidth: 250px;
+}
+
+.all-content {
+    margin-left: var(--sidebarWidth) !important;
+    margin-top: 70px !important;
+    padding: 20px;
+}
+
+.all-content.full-width {
+    margin-left: 0 !important;
+    margin-top: 80px !important;
+}
+
+/* #endregion Dashboard Layout */

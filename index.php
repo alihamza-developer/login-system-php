@@ -63,8 +63,7 @@ foreach ($routes as $url => $file) {
 
 // Require file
 if (is_null($filename)) {
-    require_once "views/404.php";
-    exit;
+    _404();
 } else {
     $GLOBALS['FILE_NAME'] = $filename;
 }
