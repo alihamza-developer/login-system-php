@@ -1,0 +1,108 @@
+.confirm-overlay {
+    --cf-surface: #ffffff;
+    --cf-ink: #0f172a;
+    --cf-body: #64748b;
+    --cf-line: #e2e8f0;
+    --cf-danger: #b91c1c;
+    --cf-danger-dark: #991b1b;
+    --cf-primary: #0f766e;
+    --cf-primary-dark: #115e59;
+
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    background: rgba(15, 23, 42, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity .18s ease;
+}
+
+.confirm-overlay.is-in {
+    opacity: 1;
+}
+
+.confirm-overlay .confirm-box {
+    width: 100%;
+    max-width: 400px;
+    background: var(--cf-surface);
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, .25);
+    padding: 26px;
+    transform: translateY(10px) scale(.98);
+    transition: transform .18s ease;
+}
+
+.confirm-overlay.is-in .confirm-box {
+    transform: none;
+}
+
+.confirm-overlay .confirm-title {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--cf-ink);
+}
+
+.confirm-overlay .confirm-text {
+    margin: 0 0 22px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--cf-body);
+}
+
+.confirm-overlay .confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirm-overlay .confirm-btn {
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    border-radius: 9px;
+    border: 1px solid var(--cf-line);
+    background: var(--cf-surface);
+    color: var(--cf-body);
+    cursor: pointer;
+    transition: background .14s ease, color .14s ease;
+}
+
+.confirm-overlay .confirm-btn:hover {
+    background: #f1f5f9;
+    color: var(--cf-ink);
+}
+
+.confirm-overlay .confirm-yes {
+    background: var(--cf-primary);
+    border-color: var(--cf-primary);
+    color: #fff;
+}
+
+.confirm-overlay .confirm-yes:hover {
+    background: var(--cf-primary-dark);
+    border-color: var(--cf-primary-dark);
+    color: #fff;
+}
+
+.confirm-overlay .confirm-yes.is-danger {
+    background: var(--cf-danger);
+    border-color: var(--cf-danger);
+}
+
+.confirm-overlay .confirm-yes.is-danger:hover {
+    background: var(--cf-danger-dark);
+    border-color: var(--cf-danger-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .confirm-overlay,
+    .confirm-overlay .confirm-box {
+        transition: none;
+    }
+}

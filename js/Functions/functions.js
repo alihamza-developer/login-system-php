@@ -57,18 +57,14 @@ function sAlert(text, heading, options = {}) {
     if (!type)
         type = heading.toLowerCase();
 
-    let icons = ["success", "error", "warning", "info", "question"];
-    if (!icons.includes(type)) type = '';
-    let msgOptions = {
-        type: type,
-        title: heading,
-        text: text,
-    };
-    if (html) {
-        delete msgOptions.text;
-        msgOptions.html = text;
-    }
-    Swal.fire(msgOptions);
+    let types = ["success", "error", "warning", "info"];
+    if (!types.includes(type)) type = 'info';
+
+    // a heading that only repeats the status adds nothing
+    let title = heading || '';
+    if (String(title).toLowerCase() === type) title = '';
+
+    return Notify.show(text, type, { title: title, html: html });
 }
 // Handle Alert
 function handleAlert(res, showSuccessAlert = true) {
@@ -90,11 +86,7 @@ function handleAlert(res, showSuccessAlert = true) {
 function makeError(error = 'Something went wrong! Please try again') {
     if (typeof error !== "string")
         error = 'Something went wrong! Please try again';
-    Swal.fire({
-        type: 'error',
-        title: 'Oops...',
-        text: error,
-    });
+    return Notify.error(error);
 }
 // Disaled button
 function disableBtn(btn) {
@@ -375,7 +367,7 @@ function copyText(text) {
 
         try {
             const successful = document.execCommand("copy");
-            if (successful) notify("Content Copied");
+            if (successful) Notify.success("Content Copied");
 
 
         } catch (error) {
@@ -387,7 +379,7 @@ function copyText(text) {
         // Use the modern clipboard API
         navigator.clipboard.writeText(text)
             .then(() => {
-                notify("Content Copied");
+                Notify.success("Content Copied");
             })
             .catch((error) => {
 
@@ -396,26 +388,6 @@ function copyText(text) {
 }
 
 
-//#region Notify
-
-let notifyId = 1;
-
-function notify(msg, type = '') {
-    $(".notify-toasts").append('<div class="single-toast ' + type + '" id="notify-' + notifyId + '">' + msg + '</div>');
-    notifyId++;
-    setTimeout(function () {
-        $(".notify-toasts #notify-" + notifyId).remove();
-    }, 4000)
-}
-
-function notifyError(err = 'Something went wrong! Please try again') {
-    notify(err, "error");
-}
-
-
-$("body").append(`<div class="notify-toasts"></div>`);
-
-//#endregion Notify 
 
 //#region DataTable
 function DataTable() {

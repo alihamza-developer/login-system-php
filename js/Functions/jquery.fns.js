@@ -276,37 +276,13 @@ function JxRequest(request) {
         }
     }
     if (dataConfirm) {
-        swalConfirm({
-            success: function () {
-                JxRequestSend(request)
-            }
+        Confirm.ask().then(result => {
+            if (result.value) JxRequestSend(request);
         });
         return false;
     }
     JxRequestSend(request);
 
-}
-// Swal Confirm
-function swalConfirm(options = {}) {
-    let { success, error } = options;
-    Swal.fire({
-        title: "Are you Sure?",
-        text: "You won't be able to revert this!",
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: "Yes",
-        cancelButtonText: "Cancel",
-    }).then((result) => {
-        if (result.value) {
-            if (success)
-                success();
-        } else {
-            if (error)
-                error();
-        }
-    });
 }
 // #endregion JX Element
 // #region Folding Card

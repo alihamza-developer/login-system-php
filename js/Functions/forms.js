@@ -238,7 +238,7 @@ $(document).on("submit", ".js-form, .ajax_form", function (e) {
             txt = $(this).dataVal("text", "You won't be able to revert this!"),
             confirmActionName = $(this).dataVal("confirm-action-name", "performBackgroundAction"),
             confirmActionValue = $(this).dataVal("confirm-action-value", true);
-        Swal.fire({
+        Confirm.ask({
             title: title,
             text: txt,
             type: 'warning',
@@ -441,7 +441,7 @@ $(document).on('click', '.delete-td-data, .delete-btn', function (e) {
     if (!dataTarget || !dataAction) return false;
     if (this.hasAttribute('data-controller')) controllerURL += $(this).attr("data-controller");
     else controllerURL += "delete";
-    Swal.fire({
+    Confirm.ask({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
         type: 'warning',
