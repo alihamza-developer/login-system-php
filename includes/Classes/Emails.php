@@ -10,11 +10,12 @@ require_once _DIR_ . "includes/inc/emails-data.php";
 class Emails extends Database
 {
     private $db;
-    public function __construct($config = [])
+    public function __construct()
     {
         global $db;
         $this->db = $db;
     }
+
     // Get Email Headers
     public function getHeaders()
     {
@@ -46,6 +47,7 @@ class Emails extends Database
     {
         return '<a href="' . $href . '" style="text-align:center;background: #17a2b8;color:#fff;text-decoration:none;padding:15px 20px;display:inline-block;">' . $text . '</a>';
     }
+
     // Replace Variables from string
     function replace_email_vars($str, $vars = [], $is_email_body = false)
     {
@@ -58,6 +60,7 @@ class Emails extends Database
         }
         return $str;
     }
+
     // Read Email File
     function get_data_from_file($filename, $vars = [])
     {
@@ -81,11 +84,13 @@ class Emails extends Database
         $file_data = $this->replace_email_vars($file_data, $vars);
         return $file_data;
     }
+
     // Get Email Structures
     function get_email_structure()
     {
         return $this->get_data_from_file('email_structure.html');
     }
+
     // Read Template file
     public function readTemplateFile($str, $vars = [])
     {
@@ -96,20 +101,8 @@ class Emails extends Database
         $file_data = $this->replace_email_vars($email_structure, $vars, true);
         return $file_data;
     }
-    // Send Email
-    /* 
-    @param $options = [
-        'template' => 'contactEmail',
-        'to' => ADMIN_EMAIL,
-        'subject' => "New Message from SITE_NAME",
-        'vars' => [
-            'name' => $name,
-            'email' => $email,
-            'subject' => $subject,
-            'message' => $message
-        ]
-    ]
-    */
+    
+    # Send Email
     public function send($options)
     {
         $template = arr_val($options, 'template');
@@ -156,42 +149,36 @@ class Emails extends Database
         }
         return false;
     }
-    // Send email
-    /* 
-    @param $data = [
-        'to' => ,
-        'body' => ,
-        'subject' => ,
-        'to_name' => optional
-    ]
-    */
+
+    # Send Email Main Function
     public function sendEmailTo($data)
     {
-        $mj = new \Mailjet\Client(MAILJET_API_KEY, MAILJET_SECRET_KEY, true, ['version' => 'v3.1']);
-        $to_name = arr_val($data, 'to_name', '');
-        $body = [
-            'Messages' => [
-                [
-                    'From' => [
-                        'Email' => CONTACT_EMAIL,
-                        'Name' => SITE_NAME
-                    ],
-                    'To' => [
-                        [
-                            'Email' => $data['to'],
-                            'Name' => $to_name
-                        ]
-                    ],
-                    'Subject' => $data['subject'],
-                    'TextPart' => "",
-                    'HTMLPart' => $data['body'],
-                    'CustomID' => "AppGettingStartedTest"
-                ]
-            ]
-        ];
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
-        $response = $mj->post(Resources::$Email, ['body' => $body]);
-        return true;
+        try {
+            $mail->isSMTP();
+            $mail->Host = SMTP_HOST;
+            $mail->Port = SMTP_PORT;
+            $mail->SMTPAuth = true;
+            $mail->Username = SMTP_USER;
+            $mail->Password = SMTP_PASS;
+            $mail->CharSet = 'UTF-8';
+            if (SMTP_SECURE) $mail->SMTPSecure = SMTP_SECURE;
+
+            $mail->setFrom(CONTACT_EMAIL, SITE_NAME);
+            $mail->addAddress($data['to'], arr_val($data, 'to_name', ''));
+
+            $mail->isHTML(true);
+            $mail->Subject = $data['subject'];
+            $mail->Body = $data['body'];
+            $mail->AltBody = strip_tags($data['body']);
+
+            $mail->send();
+            return true;
+        } catch (\Throwable $e) {
+            error_log('Email failed to ' . $data['to'] . ': ' . $mail->ErrorInfo);
+            return false;
+        }
     }
 }
 $_email = new Emails();

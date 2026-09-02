@@ -1,3 +1,8 @@
+# Ai Folders
+/docs/
+.claude
+.superpowers
+
 # Composer
 composer.phar
 composer.lock
@@ -18,6 +23,10 @@ composer.lock
 # Temp
 /temp/*
 !/temp/.gitkeep
+
+# Tests
+/tests/
+/tests/*
 
 # Extensions
 /extensions/temp/*
