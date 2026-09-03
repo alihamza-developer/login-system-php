@@ -3,7 +3,7 @@
 $ASSETS_TEPLATES_ = [
     'dataTable' => [
         'css' => [
-            url('css/jquery.dataTables.min.css'),
+            url('css/Libraries/jquery.dataTables.min.css'),
             url('css/components/datatable.css'),
         ],
         'js' => [

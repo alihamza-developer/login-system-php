@@ -2,10 +2,12 @@
 assets_file([
     'Libraries/font-awesome.min.css',
     'Libraries/bootstrap.min.css',
-    'custom.css',
-    'styles.css',
-    'components/Toaster.css',
-    'components/Dialog.css',
+    'custom.css', # Global File
+    'styles.css', # Global Styles (inputs,buttons,etc...)
+
+    # Components
+    'components/toaster.css',
+    'components/dialog.css',
     'components/checkbox.css',
     'components/loader.css',
     'components/popup-window.css',

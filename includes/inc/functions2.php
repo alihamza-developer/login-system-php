@@ -31,6 +31,7 @@ function login_user($data)
     }
     return $user;
 }
+
 // Check if is admin
 function is_admin()
 {

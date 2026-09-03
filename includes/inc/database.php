@@ -9,12 +9,15 @@ class Database
 	private $update_uid_length = 20;
 	public $conn;
 	public $insert_uid;
+
+	# Constructor
 	public function __construct()
 	{
 		$this->connect();
 	}
 
-	// Connect To Database
+
+	# Connect To Database
 	private function connect()
 	{
 		$this->conn = @new \mysqli(DB_HOST, DB_USER, DB_PASSWORD);
@@ -31,7 +34,8 @@ class Database
 			}
 		}
 	}
-	// Validation
+
+	# Validation
 	public function validText($data, $encodeHtml = true)
 	{
 		if (gettype($data) !== 'string') return $data;
@@ -42,21 +46,28 @@ class Database
 		}
 		return $data;
 	}
+
+	# Valid Phone
 	public function validPhone($data)
 	{
 		$data = preg_replace("/[^0-9+]/", "", $data);
 		return $data;
 	}
+
+	# Valid Number
 	public function validNum($data)
 	{
 		$data = preg_replace("/[^0-9]/", "", $data);
 		return $data;
 	}
+
+	# Get Time
 	public function getTime($datetime)
 	{
 		return date("d F, Y", strtotime($datetime));
 	}
-	// Add Backticks
+
+	# Add Backticks
 	private function cover_str($data, $char)
 	{
 		if (gettype($data) === "array") {
@@ -67,7 +78,8 @@ class Database
 		}
 		return "$char" . $data . "$char";
 	}
-	// Get Fn
+
+	# Get Fn
 	public function get($type, $data = [])
 	{
 		if ($type === "whereQuery") {
@@ -84,7 +96,7 @@ class Database
 					if (gettype($data) == "array") {
 						$operator = arr_val($data, "operator", $condition_operator);
 						$l_operator = arr_val($data, "logical_operator", $logical_operator);
-						// Value of condition
+						# Value of condition
 						$temp_data = $data["value"];
 						if (gettype($temp_data) === "array") {
 							$temp_where = '';
@@ -110,9 +122,9 @@ class Database
 				}
 				$where = rtrim($where, $logical_operator);
 			}
-			// order by
+			# order by
 			if ($order_by) $where .= " ORDER BY $order_by";
-			// Limit
+			# Limit
 			if ($limit) $where .= " LIMIT $limit";
 
 			return $where;
@@ -193,7 +205,8 @@ class Database
 			return $this->conn->affected_rows;
 		}
 	}
-	// Execute Select Query
+
+	# Execute Select Query
 	public function query($query, $options = [])
 	{
 		$select_query = arr_val($options, 'select_query');
@@ -209,7 +222,8 @@ class Database
 		}
 		return $records;
 	}
-	// Select Function
+
+	# Select Function
 	public function select($table, $select_data = [], $condition = [], $options = [])
 	{
 		if (is_array($select_data)) {
@@ -243,7 +257,8 @@ class Database
 		if (count($records)) return $records[0];
 		return false;
 	}
-	// Select one record
+
+	# Select one record
 	public function select_one($table, $data = ['*'], $condition = [], $options = [])
 	{
 		$options['single_record'] = true;
@@ -255,20 +270,22 @@ class Database
 		if ($record) return $record;
 		return $record;
 	}
-	// count function
+
+	# count function
 	public function count($table, $condition)
 	{
 		$record = $this->select($table, "COUNT(1) as recordsCount", $condition, ['single_record' => true]);
 		if (gettype($record) !== "array") return 0;
 		return intval($record['recordsCount']);
 	}
-	// Update data
+
+	# Update data
 	public function update($table, $data = [], $condition = [], $options = [])
 	{
 		$return_query = arr_val($options, "query");
 		$where_condition = $this->get("whereQuery", ['condition' => $condition]);
 		$options['data'] = $data;
-		// Update Data
+		# Update Data
 		$update_data = $this->get("update_data_str", $options);
 
 		$query = "UPDATE $table SET $update_data $where_condition";
@@ -276,7 +293,8 @@ class Database
 		$update = $this->query($query);
 		return $update ? true : false;
 	}
-	// Delete Data
+
+	# Delete Data
 	public function delete($table, $condition = [], $data = [])
 	{
 		$return_query = arr_val($data, "query");
@@ -292,12 +310,13 @@ class Database
 			return false;
 		}
 	}
-	// Update Uid
+
+	# Update Uid
 	public function update_uid($table, $insert_id)
 	{
 		if (in_array($table, TABLES_WITHOUT_UID)) return false;
 		$key = getRand($this->update_uid_length);
-		// check if already exists
+		# check if already exists
 		$exists = $this->count($table, ['uid' => $key]);
 		if (!$exists) {
 			$update = $this->update($table, ['uid' => $key], [
@@ -309,7 +328,8 @@ class Database
 				$this->insert_uid = false;
 		}
 	}
-	// Insert Data
+
+	# Insert Data
 	public function insert($table, $data = [], $options = [])
 	{
 		$return_query = arr_val($options, "query");
@@ -328,7 +348,8 @@ class Database
 		}
 		return false;
 	}
-	// Save Data if not exists
+
+	# Save Data if not exists
 	public function save($table, $data, $condition)
 	{
 		$saved = false;
@@ -343,7 +364,8 @@ class Database
 		}
 		return $saved;
 	}
-	// Toggle Data - If exists delete data - Insert Data
+
+	# Toggle Data - If exists delete data - Insert Data
 	public function toggle($table, $condition, $data = [])
 	{
 		$action = false;
