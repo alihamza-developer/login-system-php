@@ -89,11 +89,11 @@ $verified = LOGGED_IN_USER['verify_status'] == 1;
                 <div class="field-row">
                     <div class="form-group">
                         <label class="field-label" for="new_password">New password</label>
-                        <input type="password" id="new_password" class="form-control u_password" name="new_password" required autocomplete="new-password">
+                        <input type="password" id="new_password" class="form-control u_password" name="new_password" required data-length="[<?= AUTH_PASSWORD_MIN ?>,250]" autocomplete="new-password">
                     </div>
                     <div class="form-group">
                         <label class="field-label" for="confirm_password">Confirm new password</label>
-                        <input type="password" id="confirm_password" class="form-control u_password" name="confirm_password" required autocomplete="new-password">
+                        <input type="password" id="confirm_password" class="form-control u_password" name="confirm_password" required data-length="[<?= AUTH_PASSWORD_MIN ?>,250]" autocomplete="new-password">
                     </div>
                 </div>
 

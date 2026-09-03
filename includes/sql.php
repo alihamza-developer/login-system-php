@@ -50,3 +50,76 @@ if (_is("install_db_tables")) {
       ) ENGINE=InnoDB;");
 }
 
+
+// Add column if missing
+function _add_column($table, $column, $definition)
+{
+    global $db;
+    $exists = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'", ['select_query' => true]);
+    if (count($exists)) return false;
+    $db->query("ALTER TABLE `$table` ADD `$column` $definition");
+    return true;
+}
+// Add index if missing
+function _add_index($table, $name, $definition)
+{
+    global $db;
+    $exists = $db->query("SHOW INDEX FROM `$table` WHERE Key_name = '$name'", ['select_query' => true]);
+    if (count($exists)) return false;
+    $db->query("ALTER TABLE `$table` ADD $definition");
+    return true;
+}
+
+// Auth Tables
+$db->query("CREATE TABLE IF NOT EXISTS `sessions` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `token_hash` char(64) NOT NULL,
+    `csrf_token` char(64) NOT NULL,
+    `remember_hash` char(64) NULL DEFAULT NULL,
+    `remember_expires_at` datetime NULL DEFAULT NULL,
+    `ip` varchar(45) NULL DEFAULT NULL,
+    `user_agent` varchar(255) NULL DEFAULT NULL,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `last_seen_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `expires_at` datetime NOT NULL,
+    `revoked_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_token` (`token_hash`),
+    KEY `idx_user` (`user_id`, `revoked_at`),
+    KEY `idx_remember` (`remember_hash`)
+  ) ENGINE=InnoDB;");
+
+$db->query("CREATE TABLE IF NOT EXISTS `auth_tokens` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `type` varchar(20) NOT NULL,
+    `user_id` int(11) NULL DEFAULT NULL,
+    `identifier` varchar(190) NULL DEFAULT NULL,
+    `token_hash` char(64) NOT NULL,
+    `attempts` tinyint(4) NOT NULL DEFAULT 0,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `expires_at` datetime NOT NULL,
+    `used_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_lookup` (`type`, `token_hash`),
+    KEY `idx_identifier` (`type`, `identifier`, `expires_at`)
+  ) ENGINE=InnoDB;");
+
+$db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `identifier` varchar(190) NOT NULL,
+    `attempted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`id`),
+    KEY `idx_lookup` (`identifier`, `attempted_at`)
+  ) ENGINE=InnoDB;");
+
+// Auth User Columns
+_add_column('users', 'role', "varchar(50) NOT NULL DEFAULT 'user'");
+_add_column('users', 'phone', "varchar(32) NULL DEFAULT NULL");
+_add_column('users', 'email_verified_at', "timestamp NULL DEFAULT NULL");
+_add_column('users', 'phone_verified_at', "timestamp NULL DEFAULT NULL");
+_add_index('users', 'uq_email', "UNIQUE KEY `uq_email` (`email`)");
+
+// Backfill from the old columns
+$db->query("UPDATE `users` SET `role` = 'admin' WHERE `is_admin` = 1 AND `role` <> 'admin';");
+$db->query("UPDATE `users` SET `email_verified_at` = `date_added` WHERE `verify_status` = 1 AND `email_verified_at` IS NULL;");

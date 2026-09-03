@@ -1,5 +1,8 @@
 <?php
-	session_start();
-    unset($_SESSION['user_id']);
-    header('Location: ../login');
-    exit;
+define('DIR', './');
+define('_DIR_', DIR . "../");
+require_once _DIR_ . "includes/db.php";
+
+$_auth->logout();
+header('Location: ../login');
+exit;

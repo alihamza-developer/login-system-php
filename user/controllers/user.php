@@ -35,6 +35,8 @@ if (isset($_POST['change_password'])) {
 	$confirm_password = _POST('confirm_password');
 
 	// Validate
+	if (strlen($new_password) < AUTH_PASSWORD_MIN)
+		returnError('New password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
 	if ($new_password !== $confirm_password)
 		returnError('New password is not matching with confirm password. Please try again');
 	// Verify current password

@@ -4,65 +4,57 @@ require_once(DIR . 'includes/db.php');
 require_once _DIR_ . "includes/Classes/Emails.php";
 // Sign Up
 if (isset($_POST['register_new_user'])) {
-	$fname      = $_POST['fname'];
-	$lname      = $_POST['lname'];
-	$name       = $fname . " " . $lname;
-	$email      = $_POST['email'];
-	$password   = $_POST['password'];
-	$c_password = $_POST['c_password'];
-	if ($c_password === $password) {
-		$check = $db->select_one("users", '*', ['email' => $email]);
-		if (gettype($check) === "array") {
-			echo error('Email Already Exists. Go to Log In Page');
-		} else {
-			$password = password_hash($password, PASSWORD_BCRYPT);
-			$add_user = $db->insert('users', [
-				'fname' => $fname,
-				'lname' => $lname,
-				'name' => $name,
-				'email' => $email,
-				'image' => 'avatar.png',
-				'password' => $password,
-				'verify_status' => 0,
-				'date_added' => $timestamp
-			]);
-			if ($add_user) {
-				$user_id = $add_user;
-				sendVerifyToken($email);
-				echo success('We sent a verfication link to your email. Please Verify your account');
-			}
-		}
-	}
+	$fname      = _POST('fname', ['default' => '']);
+	$lname      = _POST('lname', ['default' => '']);
+	$name       = trim("$fname $lname");
+	$email      = _POST('email', ['default' => '']);
+	$password   = _POST('password', ['default' => '']);
+	$c_password = _POST('c_password', ['default' => '']);
+
+	if ($fname === '') returnError('First name is required');
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) returnError('Enter a valid email address');
+	if (strlen($password) < AUTH_PASSWORD_MIN) returnError('Password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
+	if ($password !== $c_password) returnError('Passwords do not match');
+
+	$check = $db->select_one("users", '*', ['email' => $email]);
+	if ($check) returnError('Email Already Exists. Go to Log In Page');
+
+	$add_user = $db->insert('users', [
+		'fname' => $fname,
+		'lname' => $lname,
+		'name' => $name,
+		'email' => $email,
+		'image' => 'avatar.png',
+		'password' => password_hash($password, AUTH_PASSWORD_ALGO),
+		'verify_status' => 0,
+		'date_added' => $timestamp
+	]);
+	if (!$add_user) returnError('We could not create your account. Please try again.');
+
+	sendVerifyToken($email);
+	echo success('We sent a verfication link to your email. Please Verify your account');
 }
 // Login
 if (isset($_POST['login'])) {
-	$email    = $_POST['email'];
-	$password = $_POST['password'];
-	$user = $db->select_one('users', '*', [
-		'email' => $email
-	]);
-	if ($user) {
-		$account_password = $user['password'];
-		if (!password_verify($password, $account_password)) {
-			echo error('Password is wrong. Please enter a valid passowrd');
-			die();
+	$email    = _POST('email');
+	$password = _POST('password');
+
+	$user = $_auth->attempt($email, $password);
+	if (!$user) {
+		# Unverified accounts can resend
+		if ($_auth->fail_reason() === 'unverified') {
+			$resend = 'action?type=verify-email&email=' . urlencode($email);
+			returnError('Please verify your account. <a href="' . $resend . '">Click here to resend</a>', ['html' => true]);
 		}
-		$user_id = $user['id'];
-		if ($user['verify_status'] != '1') {
-			$token  = md5(time() . "" . $user_id);
-			$db->update('users', ['verify_token' => $token, 'token_expiry_date' => $timestamp], ['id' => $user_id]);
-			echo error('Please verify your account. <a href="action?type=verify-email&email=' . $email . '">Click here to resend</a>', [
-				'html' => true
-			]);
-		} else {
-			$_SESSION['user_id'] = $user_id;
-			echo success('logged in successfully', [
-				'redirect' => 'user/dashboard'
-			]);
-		}
-	} else {
-		echo error('Email or Password is wrong. Please Try with a valid email and password');
+		returnError('Email or Password is wrong. Please Try with a valid email and password');
 	}
+
+	if (!$_auth->login($user['id']))
+		returnError('We could not sign you in. Please try again.');
+
+	echo success('logged in successfully', [
+		'redirect' => 'user/dashboard'
+	]);
 }
 // Send Reset Password Link
 if (isset($_POST['send_reset_password_link'])) {
@@ -127,6 +119,9 @@ if (isset($_POST['reset_password'])) {
 		echo error($invalid_link);
 		die();
 	}
+
+	if (strlen($new_password) < AUTH_PASSWORD_MIN)
+		returnError('Password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
 
 	if ($new_password !== $confirm_password) {
 		echo error('Password is not matching');

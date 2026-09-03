@@ -47,6 +47,7 @@ function verifyUserWithToken($email, $token)
         return error("Verification Link expired. We sent a new verfication link to your email. Please Verify your account with in 24 hours");
 
     $db->update("users", [
+        'email_verified_at' => date('Y-m-d H:i:s'),
         'verify_status' => 1
     ], ['id' => $user['id']]);
     return success("Congratulations! Your account is verified successfully. You can logged in now");

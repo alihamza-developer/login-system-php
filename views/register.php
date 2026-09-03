@@ -47,7 +47,7 @@ require_once "includes/head.php";
                 <label class="field-label" for="password">Password</label>
                 <div class="input-group">
                     <span class="input-group-text"><?= svg_icon("lock") ?></span>
-                    <input type="password" id="password" name="password" class="form-control u_password" placeholder="Create a password" autocomplete="new-password" required>
+                    <input type="password" id="password" name="password" class="form-control u_password" placeholder="Create a password" autocomplete="new-password" required data-length="[<?= AUTH_PASSWORD_MIN ?>,250]">
                 </div>
             </div>
 
@@ -55,7 +55,7 @@ require_once "includes/head.php";
                 <label class="field-label" for="c_password">Confirm password</label>
                 <div class="input-group">
                     <span class="input-group-text"><?= svg_icon("lock") ?></span>
-                    <input type="password" id="c_password" name="c_password" class="form-control u_password" placeholder="Repeat your password" autocomplete="new-password" required>
+                    <input type="password" id="c_password" name="c_password" class="form-control u_password" placeholder="Repeat your password" autocomplete="new-password" required data-length="[<?= AUTH_PASSWORD_MIN ?>,250]">
                 </div>
             </div>
 
