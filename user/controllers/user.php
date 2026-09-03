@@ -1,6 +1,10 @@
 <?php
 define('DIR', '../');
 require_once(DIR . 'includes/db.php');
+
+# Must be signed in
+if (!LOGGED_IN_USER) returnError('You need to be signed in to do that.');
+
 // Update Personal Info
 if (isset($_POST['update_personal_information'])) {
 	$fname = _POST('fname');
@@ -31,7 +35,7 @@ if (isset($_POST['change_password'])) {
 	$confirm_password = _POST('confirm_password');
 
 	// Validate
-	if (!$new_password !== $confirm_password)
+	if ($new_password !== $confirm_password)
 		returnError('New password is not matching with confirm password. Please try again');
 	// Verify current password
 	if (!password_verify($current_password, LOGGED_IN_USER['password']))
@@ -40,7 +44,8 @@ if (isset($_POST['change_password'])) {
 	$new_password = password_hash($new_password, PASSWORD_BCRYPT);
 	$update = $db->update('users', ['password' => $new_password], [
 		'id' => LOGGED_IN_USER['id']
-	]);
+	], ['encodeHtml' => false]);
 
-	if ($update) returnSuccess('Passowrd Changed Successfully');
+	if (!$update) returnError('We could not change your password. Please try again.');
+	returnSuccess('Password changed successfully');
 }

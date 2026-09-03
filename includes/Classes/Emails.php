@@ -2,7 +2,6 @@
 
 namespace Email;
 
-use \Mailjet\Resources;
 use \DB\Database;
 
 require_once _DIR_ . "includes/inc/emails-data.php";
@@ -10,46 +9,27 @@ require_once _DIR_ . "includes/inc/emails-data.php";
 class Emails extends Database
 {
     private $db;
+    private $base_file;
+    private $base_vars;
+
+    # Constructor
     public function __construct()
     {
         global $db;
         $this->db = $db;
-    }
-
-    // Get Email Headers
-    public function getHeaders()
-    {
-        $from = SITE_EMAIL;
-        $site_name = SITE_NAME;
-        $br = "\r\n";
-
-        $headers = [
-            "Reply-To" => $from,
-            "Return-Path" => $from,
-            "From" => $from,
-            "Organization" => '',
-            "MIME-Version" => '1.0',
-            "Content-type" => 'text/html; charset=utf-8',
-            "X-Priority" => '3',
-            "X-Mailer" => "PHP" . phpversion(),
+        $this->base_file = "base-structure";
+        $this->base_vars = [
+            'site_name' => SITE_NAME,
+            'site_url' => SITE_URL,
+            'login_url' => merge_path(SITE_URL, "login"),
+            'site_email' => CONTACT_EMAIL,
+            'site_logo_url' => url('images/logo-with-name.png?v=1.0'),
+            'site_initial' => strtoupper(substr(SITE_NAME, 0, 1)),
         ];
-
-        $headers_str = "";
-
-        foreach ($headers as $key => $value) {
-            $headers_str .= "{$key} {$site_name} <\"$value\">";
-        }
-
-        return $headers_str;
-    }
-    // Create button
-    public function createBtn($text, $href)
-    {
-        return '<a href="' . $href . '" style="text-align:center;background: #17a2b8;color:#fff;text-decoration:none;padding:15px 20px;display:inline-block;">' . $text . '</a>';
     }
 
-    // Replace Variables from string
-    function replace_email_vars($str, $vars = [], $is_email_body = false)
+    # Replace variables in string
+    function replace_vars($str, $vars = [], $is_email_body = false)
     {
         foreach ($vars as $var => $value) {
             $var = strtolower($var);
@@ -61,94 +41,79 @@ class Emails extends Database
         return $str;
     }
 
-    // Read Email File
-    function get_data_from_file($filename, $vars = [])
+    # Get template from file
+    function get_template($name)
     {
-        $filepath = _DIR_ . "includes/Classes/templates/" . $filename;
-        if (!is_file($filepath))
-            return null;
-
-        $file_data = file_get_contents($filepath);
-        $vars = array_merge([
-            'site_url' => SITE_URL,
-            'site_name' => SITE_NAME,
-            'site_email' => SITE_EMAIL,
-            'site_phone' => SITE_PHONE,
-            'site_phone_image' => url("images/png-icons/phone.png"),
-            'site_mail_image' => url("images/png-icons/mail.png"),
-            'site_url_image' => url("images/png-icons/globe.png"),
-            'www_site_url' => get_www_url(SITE_URL),
-            // 'email_header_image' => merge_path(SITE_URL, 'images/email-header.jpg'),
-            // 'email_footer_image' => merge_path(SITE_URL, 'images/email-footer.jpg'),
-        ], $vars);
-        $file_data = $this->replace_email_vars($file_data, $vars);
-        return $file_data;
+        if (!isset(EMAILS[$name])) return null;
+        $file = _DIR_ . "includes/templates/{$name}.html";
+        if (!is_file($file)) return null;
+        return file_get_contents($file);
     }
 
-    // Get Email Structures
-    function get_email_structure()
+    # Read Template file
+    public function read_template_file($str, $vars = [])
     {
-        return $this->get_data_from_file('email_structure.html');
-    }
-
-    // Read Template file
-    public function readTemplateFile($str, $vars = [])
-    {
-        $email_body = $this->replace_email_vars($str, $vars);
+        $email_body = $this->replace_vars($str, $vars);
         $vars['email_body'] = $email_body;
+
         // Get Email Structure
-        $email_structure = $this->get_email_structure();
-        $file_data = $this->replace_email_vars($email_structure, $vars, true);
+        $file_data = $this->replace_vars($this->get_template($this->base_file), $vars, true);
         return $file_data;
     }
-    
+
+    # Get User Data
+    public function get_user_data($email)
+    {
+        $user = $this->db->select_one("users", '*', ['email' => $email]);
+        if (!$user) return [];
+        return [
+            'user_firstname' => arr_val($user, 'fname', ''),
+            'user_lastname' => arr_val($user, 'lname', ''),
+            'user_name' => arr_val($user, 'name', ''),
+            'user_email' => arr_val($user, 'email', ''),
+        ];
+    }
+
     # Send Email
     public function send($options)
     {
         $template = arr_val($options, 'template');
         $to = $options['to'];
-        if ($template) {
-            if (!isset(EMAILS[$template])) return;
-            // Read Template file
-            $name = $template;
-            $template = EMAILS[$template];
-            $email_template  = $this->db->select_one("email_templates", '*', ['name' => $name]);
-            if (!$email_template) return;
+        if (!$template) return false;
 
-            $subject = $email_template['subject'];
-            $body = html_entity_decode(htmlspecialchars_decode($email_template['body']));
+        if (!isset(EMAILS[$template])) return;
 
-            $vars = arr_val($options, 'vars', []);
-            $vars = array_merge($vars, [
-                'site_name' => SITE_NAME,
-                'site_url' => SITE_URL,
-                'login_url' => merge_path(SITE_URL, "login"),
-                'site_email' => CONTACT_EMAIL,
-                'site_logo_url' => url('images/logo-with-name.png?v=1.0'),
-                'site_initial' => strtoupper(substr(SITE_NAME, 0, 1)),
-            ]);
-            // User Data
-            $user = $this->db->select_one("users", '*', ['email' => $to]);
-            $vars['user_firstname'] = arr_val($user, 'fname', '');
-            $vars['user_lastname'] = arr_val($user, 'lname', '');
-            $vars['user_name'] = arr_val($user, 'name', '');
-            $vars['user_email'] = arr_val($user, 'email', '');
-            // Read template file
-            $data = $this->readTemplateFile($body, $vars);
-            $subject_ = $this->replace_email_vars($subject, $vars);
+        if ($template === $this->base_file) return;
 
-            // Return Html
-            if (arr_val($options, 'return_html', false))
-                return $data;
+        $name = $template;
+        $template = EMAILS[$template];
+        $body = $this->get_template($name);
+        if (!$body) return;
 
-            // Send Email
-            return $this->sendEmailTo([
-                'to' => $to,
-                'body' => $data,
-                'subject' => $subject_
-            ]);
-        }
-        return false;
+        $subject = arr_val($template, 'subject', SITE_NAME);
+
+        $vars = arr_val($options, 'vars', []);
+
+        # Merge Base Variables Global
+        $vars = array_merge($vars, $this->base_vars);
+
+        # Merge User Variables
+        $vars = array_merge($vars, $this->get_user_data($to));
+
+
+        # Read Template File
+        $body = $this->read_template_file($body, $vars);
+        $subject_ = $this->replace_vars($subject, $vars);
+
+        // Return Html
+        if (arr_val($options, 'return_html', false)) return $body;
+
+        // Send Email
+        return $this->sendEmailTo([
+            'to' => $to,
+            'body' => $body,
+            'subject' => $subject_
+        ]);
     }
 
     # Send Email Main Function

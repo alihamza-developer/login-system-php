@@ -50,14 +50,3 @@ if (_is("install_db_tables")) {
       ) ENGINE=InnoDB;");
 }
 
-// Email Templates Table
-if (_is("install_email_templates_table")) {
-    $db->query("CREATE TABLE `email_templates` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `name` varchar(100) NOT NULL,
-        `subject` varchar(250) NOT NULL,
-        `body` longtext NOT NULL,
-        `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-        PRIMARY KEY (`id`)
-      )");
-}

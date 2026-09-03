@@ -1,22 +1,13 @@
 /* #region Page */
 
 .authorize-page {
-    --az-surface: var(--surfaceColor);
-    --az-ink: var(--inkColor);
-    --az-muted: var(--mutedColor);
-    --az-line: var(--lineColor);
-    --az-field: var(--fieldColor);
-    --az-accent: var(--accentColor);
-    --az-accent-hover: var(--accentHover);
-    --az-accent-soft: var(--accentSoft);
-
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
     background:
-        radial-gradient(760px 380px at 50% -10%, var(--az-accent-soft), transparent 72%),
+        radial-gradient(760px 380px at 50% -10%, var(--accentSoft), transparent 72%),
         var(--groundColor);
 }
 
@@ -28,8 +19,8 @@
 .authorize-page .auth-card {
     width: 100%;
     max-width: 430px;
-    background: var(--az-surface);
-    border: 1px solid var(--az-line);
+    background: var(--surfaceColor);
+    border: 1px solid var(--lineColor);
     border-radius: 16px;
     box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 12px 32px rgba(16, 24, 40, .08);
     padding: 36px 34px;
@@ -47,7 +38,7 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: var(--az-accent);
+    background: var(--accentColor);
     color: #fff;
     display: flex;
     align-items: center;
@@ -59,7 +50,7 @@
 .authorize-page .auth-card .auth-brand .brand-name {
     font-size: 15px;
     font-weight: 600;
-    color: var(--az-ink);
+    color: var(--inkColor);
     letter-spacing: .2px;
 }
 
@@ -67,14 +58,14 @@
     margin: 0 0 6px;
     font-size: 22px;
     font-weight: 700;
-    color: var(--az-ink);
+    color: var(--inkColor);
     text-align: center;
 }
 
 .authorize-page .auth-card .auth-sub {
     margin: 0 0 26px;
     font-size: 14px;
-    color: var(--az-muted);
+    color: var(--mutedColor);
     text-align: center;
 }
 
@@ -92,22 +83,22 @@
     margin-bottom: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--az-ink);
+    color: var(--inkColor);
 }
 
 .authorize-page .auth-card .auth-field .input-group {
     display: flex;
     align-items: center;
-    background: var(--az-field);
-    border: 1px solid var(--az-line);
+    background: var(--fieldColor);
+    border: 1px solid var(--lineColor);
     border-radius: 10px;
     overflow: hidden;
     transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
 .authorize-page .auth-card .auth-field .input-group:focus-within {
-    background: var(--az-surface);
-    border-color: var(--az-accent);
+    background: var(--surfaceColor);
+    border-color: var(--accentColor);
     box-shadow: 0 0 0 3px var(--accentRing);
 }
 
@@ -119,7 +110,7 @@
     padding: 0 4px 0 13px;
     background: none;
     border: 0;
-    color: var(--az-muted);
+    color: var(--mutedColor);
 }
 
 .authorize-page .auth-card .auth-field .input-group .input-group-text svg {
@@ -134,7 +125,7 @@
     padding: 12px 13px 12px 8px;
     font-size: 14px;
     font-family: inherit;
-    color: var(--az-ink);
+    color: var(--inkColor);
     background: none;
     border: 0;
     outline: 0;
@@ -178,12 +169,12 @@
 }
 
 .authorize-page .auth-card .field-hint a {
-    color: var(--az-muted);
+    color: var(--mutedColor);
     text-decoration: none;
 }
 
 .authorize-page .auth-card .field-hint a:hover {
-    color: var(--az-accent);
+    color: var(--accentColor);
     text-decoration: underline;
 }
 
@@ -200,7 +191,7 @@
     font-weight: 600;
     font-family: inherit;
     color: #fff;
-    background: var(--az-accent);
+    background: var(--accentColor);
     border: 0;
     border-radius: 10px;
     cursor: pointer;
@@ -208,7 +199,7 @@
 }
 
 .authorize-page .auth-card .auth-submit:hover {
-    background: var(--az-accent-hover);
+    background: var(--accentHover);
     color: #fff;
 }
 
@@ -225,14 +216,14 @@
 .authorize-page .auth-card .auth-foot {
     margin: 24px 0 0;
     padding-top: 20px;
-    border-top: 1px solid var(--az-line);
+    border-top: 1px solid var(--lineColor);
     font-size: 14px;
-    color: var(--az-muted);
+    color: var(--mutedColor);
     text-align: center;
 }
 
 .authorize-page .auth-card .auth-foot a {
-    color: var(--az-accent);
+    color: var(--accentColor);
     font-weight: 600;
     text-decoration: none;
 }

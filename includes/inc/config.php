@@ -24,7 +24,6 @@ define('ASSETS_V', "?v=" . (ENV === 'prod' ? '1.0.0' : time()));
 define('IMAGES_EXTS', ['jpg', 'png', 'jpeg', 'gif']);
 
 @define('TABLES_WITHOUT_UID', [
-    'email_templates',
     'meta_data'
 ]);
 

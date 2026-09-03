@@ -74,9 +74,9 @@ function error($data = "Error Please Try Again!", $options = [])
 {
     return create_json_message("error", $data, $options);
 }
-function returnError($data, $options = [])
+function returnError($data = "Error Please Try Again!", $options = [])
 {
-    return error($data, $options);
+    echo error($data, $options);
     die();
 }
 function returnSuccess($data = "Data Updated Successfully!", $options = [])
@@ -366,6 +366,7 @@ function get_ext($file_name)
 #endregion File Functions
 function _404()
 {
+    global $CSS_FILES_, $JS_FILES_, $SCRIPT_;
     require_once _DIR_ . "404.php";
     exit;
 }
@@ -395,14 +396,6 @@ function url(...$paths)
     return $url;
 }
 
-// Validate Email Template
-function validateEmailTemplateByName($name)
-{
-    global $db;
-    if (!isset(EMAILS[$name])) returnError("Template not found in emails");
-    $email_template  = $db->select_one("email_templates", '*', ['name' => $name]);
-    if (!$email_template) returnError("Template not found in database");
-}
 
 function datetime()
 {

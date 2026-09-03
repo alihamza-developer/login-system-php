@@ -51,7 +51,7 @@ if (isset($_POST['login'])) {
 		if ($user['verify_status'] != '1') {
 			$token  = md5(time() . "" . $user_id);
 			$db->update('users', ['verify_token' => $token, 'token_expiry_date' => $timestamp], ['id' => $user_id]);
-			echo error('Please verify your account. <a href="action?type=verifyEmail&email=' . $email . '">Click here to resend</a>', [
+			echo error('Please verify your account. <a href="action?type=verify-email&email=' . $email . '">Click here to resend</a>', [
 				'html' => true
 			]);
 		} else {
@@ -78,7 +78,7 @@ if (isset($_POST['send_reset_password_link'])) {
 		$update = $db->update('users', ['password_forgot_token' => $forgot_token, 'token_expiry_date' => $token_expiry_date], ['id' => $user['id']]);
 		if ($update) {
 			$_email->send([
-				'template' => 'forgotEmail',
+				'template' => 'forgot-email',
 				'to' => $email,
 				'vars' => [
 					'token' => $forgot_token,

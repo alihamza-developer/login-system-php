@@ -1,16 +1,29 @@
 <?php
+# Emails 
 $EMAILS_ = [
-    'forgotEmail' => [
+    'base-structure' => [
+        'title' => 'Email Structure',
+        'description' => 'The shared wrapper every email is placed inside.',
+        'variables' => ['email_body', 'site_initial'],
+        'is_non_user_email' => true
+    ],
+    'forgot-email' => [
         'title' => 'Forgot Password',
-        'variables' => array_merge(['reset_password_url', 'to']),
+        'subject' => 'Reset your password',
+        'description' => 'Sent when someone requests a password reset link.',
+        'variables' => ['token', 'to'],
     ],
-    'verifyEmail' => [
+    'verify-email' => [
         'title' => 'Verify Email',
-        'variables' => array_merge(['verify_email_url', 'to']),
+        'subject' => 'Verify your email address',
+        'description' => 'Sent after signup to confirm the email address.',
+        'variables' => ['token', 'to'],
     ],
-    'contactEmail' => [
+    'contact-email' => [
         'title' => 'Contact Email',
-        'variables' => array_merge(['name', 'email', 'subject', 'message']),
+        'subject' => 'New message from {{site_name}}',
+        'description' => 'Sent to the site owner from the contact form.',
+        'variables' => ['name', 'email', 'subject', 'message'],
         'is_non_user_email' => true
     ]
 ];

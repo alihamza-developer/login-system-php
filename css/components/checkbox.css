@@ -1,0 +1,80 @@
+/* #region Checkbox */
+
+.checkboxLabel {
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    color: var(--inkColor);
+    -webkit-align-items: center;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.checkboxLabel .checkbox {
+    width: 0px !important;
+    height: 0px !important;
+    opacity: 0 !important;
+}
+
+.checkboxLabel .c-box {
+    width: 15px;
+    height: 15px;
+    border: 1px solid var(--mutedColor);
+    margin-right: 5px;
+    display: flex;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.checkboxLabel .c-box svg {
+    width: 10px;
+    fill: #fff;
+    -webkit-transform: scale(0);
+    -moz-transform: scale(0);
+    -ms-transform: scale(0);
+    -o-transform: scale(0);
+    transform: scale(0);
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+    transition: 0.3s;
+}
+
+.checkboxLabel .checkbox:checked~.c-box {
+    background: var(--accentColor);
+    border-color: var(--accentColor);
+}
+
+.checkboxLabel .checkbox:checked~.c-box svg {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+}
+
+.checkboxLabel .checkbox:focus~.c-box {
+    position: relative;
+}
+
+.checkboxLabel .checkbox:focus~.c-box::after {
+    content: "";
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    background-color: var(--accentRing);
+    border-radius: 50%;
+    position: absolute;
+    z-index: -1;
+}
+
+/* #endregion Checkbox */

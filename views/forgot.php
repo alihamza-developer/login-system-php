@@ -30,7 +30,7 @@ if (isset($_GET['reset']) && isset($_GET['token']) && isset($_GET['email'])) {
             ], ['id' => $user['id']]);
 
             $_email->send([
-                'template' => 'forgotEmail',
+                'template' => 'forgot-email',
                 'to' => $user['email'],
                 'vars' => ['token' => $new_forgot_token, 'to' => $user['email']]
             ]);

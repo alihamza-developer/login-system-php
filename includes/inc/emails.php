@@ -15,7 +15,7 @@ function sendVerifyToken($to)
     ], ['id' => $user['id']]);
 
     $email_sent = $_email->send([
-        'template' => 'verifyEmail',
+        'template' => 'verify-email',
         'to' => $user['email'],
         'vars' => [
             'token' => $new_token,

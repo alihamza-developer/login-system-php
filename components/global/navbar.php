@@ -1,11 +1,15 @@
-<nav class="navbar full-width">
-    <a class="logo page-name" href="#"><?= SITE_NAME ?></a>
-    <div class="menu">
+<nav class="site-navbar">
+    <a class="site-brand" href="<?= url('home') ?>">
+        <span class="brand-mark"><?= strtoupper(substr(SITE_NAME, 0, 1)) ?></span>
+        <span class="brand-name"><?= SITE_NAME ?></span>
+    </a>
+
+    <div class="site-menu">
         <?php
         if (!LOGGED_IN_USER) {
         ?>
-            <a href="login" class="btn mr-2">Login</a>
-            <a href="register" class="btn">Register</a>
+            <a href="<?= url('login') ?>" class="btn btn-ghost">Sign in</a>
+            <a href="<?= url('register') ?>" class="btn btn-primary">Create account</a>
         <?php
         } else {
         ?>
@@ -15,9 +19,10 @@
                 </button>
                 <div class="dropdown-menu">
                     <?php if (IS_ADMIN) { ?>
-                        <a href="<?= _DIR_ ?>admin/login" class="dropdown-item"><?= svg_icon("user-cog");  ?> <span class="text">Admin Dashboard</span></a>
+                        <a href="<?= url('admin/dashboard') ?>" class="dropdown-item"><?= svg_icon("user-cog") ?> <span class="text">Admin panel</span></a>
                     <?php } ?>
-                    <a href="logout" class="dropdown-item"><?= svg_icon("logout"); ?> <span class="text">Logout</span></a>
+                    <a href="<?= url('user/dashboard') ?>" class="dropdown-item"><?= svg_icon("th-large") ?> <span class="text">Dashboard</span></a>
+                    <a href="<?= url('logout') ?>" class="dropdown-item"><?= svg_icon("sign-out-alt") ?> <span class="text">Logout</span></a>
                 </div>
             </div>
         <?php

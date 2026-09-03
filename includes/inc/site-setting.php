@@ -3,10 +3,12 @@
 $ASSETS_TEPLATES_ = [
     'dataTable' => [
         'css' => [
-            url('css/jquery.dataTables.min.css')
+            url('css/jquery.dataTables.min.css'),
+            url('css/components/datatable.css'),
         ],
         'js' => [
-            url('js/jquery.dataTables.min.js')
+            url('js/Libraries/jquery.dataTables.min.js'),
+            url('js/components/datatable.js'),
         ]
     ],
     "sortable" => [
@@ -51,6 +53,7 @@ $ASSETS_TEPLATES_ = [
             url('css/dashboard/index.css'),
             url('css/dashboard/sidebar.css'),
             url('css/dashboard/navbar.css'),
+            url('css/components/avatar-upload.css'),
         ],
         'js' => [
             url('js/dashboard/sidebar.js'),

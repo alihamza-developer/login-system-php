@@ -1,5 +1,4 @@
-const spinner = '<span class="spinner"></span>',
-    l = console.log.bind(this),
+let l = console.log.bind(this),
     logError = console.error.bind(this);
 function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
@@ -91,15 +90,19 @@ function makeError(error = 'Something went wrong! Please try again') {
 // Disaled button
 function disableBtn(btn) {
     btn = $(btn);
-    btn.html(spinner);
-    btn.addClass('disabled');
+    if (btn.data('btn-html') === undefined) btn.data('btn-html', btn.html());
+    // keep the label so the button keeps its size
+    btn.html('<span class="btn-label">' + btn.data('btn-html') + '</span>');
+    btn.addClass('is-loading disabled');
     btn.prop('disabled', true);
 }
 // Enable button
 function enableBtn(btn, text) {
     btn = $(btn);
-    btn.html(text);
-    btn.removeClass('disabled');
+    let original = btn.data('btn-html');
+    btn.html(text !== undefined && text !== null ? text : original);
+    btn.removeData('btn-html');
+    btn.removeClass('is-loading disabled');
     btn.prop('disabled', false);
 }
 function isObject(obj) {
@@ -213,7 +216,7 @@ function refreshFns() {
     bsTooltips(); // bootstrap tooltips & Popover
     fancyCheckbox(); // Checkbox
     initTinymce(); // Tinymce
-    DataTable(); // DataTable
+    if (typeof DataTable === "function") DataTable(); // DataTable
     initJxReqElements('.jx-req-element'); // Jx Elements
 }
 $(document).ready(refreshFns);
@@ -273,7 +276,6 @@ function initTinymce() {
             "@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); body { font-family: Poppins, sans-serif; }",
     };
 
-
     CONFIG.setup = (editor) => {
         const listener = (editor) => {
             let id = editor.id,
@@ -298,7 +300,6 @@ function initTinymce() {
                 $(item).remove(); // Remove Tinymce extra elements
             });
             $('.tox-statusbar__branding').remove();
-
 
             $element = $(editor.targetElm);
             if ($element.hasAttr("data-height")) {
@@ -341,7 +342,6 @@ $(document).on("click", "[data-dismiss='popup']", function () {
 
 //#endregion Popup Window
 
-
 // Download File
 function downloadFile(name, url) {
     let a = document.createElement('a');
@@ -352,7 +352,6 @@ function downloadFile(name, url) {
     a.click();
     document.body.removeChild(a);
 }
-
 
 // Copy Text
 function copyText(text) {
@@ -368,7 +367,6 @@ function copyText(text) {
         try {
             const successful = document.execCommand("copy");
             if (successful) Notify.success("Content Copied");
-
 
         } catch (error) {
             console.error("Failed to copy text to clipboard:", error);
@@ -387,83 +385,3 @@ function copyText(text) {
     }
 }
 
-
-
-//#region DataTable
-function DataTable() {
-    $(".dataTable:not([data-launch])").each(function () {
-        $(this).attr("data-launch", "true");
-        let table = $(this).DataTable({});
-        // Filters
-        if ($(this).hasAttr("data-filters") || false) {
-            $(this).find("thead tr th, thead tr td").each(function (i) {
-                let parent = $(this).parents(".table-responsive");
-                if (parent.find(".filter-row").length < 1) parent.prepend('<div class="row filter-row pb-3"></div>');
-
-                let filtersParent = parent.find(".filter-row"),
-                    name = $(this).text();
-                //lists for search
-                if ($(this).hasAttr("data-filter")) {
-                    let columnData = [];
-                    data = table.column(i).data(),
-                        selector = 'table-filter-' + name.replace(/[^a-zA-Z]/g, '');
-                    for (let j = 0; j < data.length; j++) {
-                        let cData = data[j];
-                        if (!columnData.includes(cData))
-                            columnData.push(cData)
-                    }
-                    let filterType = $(this).data("filter"),
-                        element = '',
-                        event = "change";
-                    if (filterType === "list") {
-                        let listItems = '',
-                            listItemsArr = [];
-                        columnData.forEach(item => {
-                            let items = filterItems(item);
-                            if (items === false) {
-                                item = stripTags(item);
-                                items = [item];
-                            }
-                            items.forEach(fItem => {
-                                fItem = fItem.trim();
-                                let itemText = capitalizeFirstLetter(fItem);
-                                if (!listItemsArr.includes(fItem)) {
-                                    listItems += `<option value="${fItem}">${itemText}</option>`;
-                                    listItemsArr.push(fItem);
-                                }
-                            })
-                        });
-                        element = `<select class="form-control ${selector}">
-                                        <option value="">-- Select --</option>
-                                        ${listItems}
-                                    </select>`;
-                    } else if (filterType === "date") {
-                        element = `<input type="date" class="form-control date_input ${selector}">`;
-                    }
-                    let col = 'col-lg-3';
-                    if ($(this).data("col")) col = $(this).data("col");
-                    let list = `
-                    <div class="${col}">
-                    <span class="label">${name}</span>
-                    ${element}
-                    </div>`;
-                    filtersParent.append(list);
-
-                    // Add filter functionality
-                    $('.' + selector).on('change', function () {
-                        setTimeout(() => {
-                            if (table.column(i).search() !== this.value) {
-                                table
-                                    .column(i)
-                                    .search(this.value)
-                                    .draw();
-                            }
-                        }, 500);
-                    });
-                }
-            });
-        }
-    });
-
-};
-//#endregion DataTable

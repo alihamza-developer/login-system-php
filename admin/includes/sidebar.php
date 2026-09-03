@@ -14,12 +14,6 @@ define('SIDEBAR_OPTIONS_ADMIN', [
         'url' => 'users',
     ],
     [
-        'title' => "Email Templates",
-        'description' => "Manage all the email templates",
-        'icon' => 'mail',
-        'url' => 'email-templates',
-    ],
-    [
         'title' => "Profile Setting",
         'description' => "Manage your profile settings",
         'icon' => 'user-cog',
@@ -28,16 +22,17 @@ define('SIDEBAR_OPTIONS_ADMIN', [
 ]);
 ?>
 
-
 <div class="sidebar">
-    <div class="user-info">
-        <div class="user-image-container">
-            <img src="../images/users/<?= LOGGED_IN_USER['image']; ?>" alt="user-img" class="user-img">
-        </div>
-        <div>
-            <p class="user-name" style="text-transform: capitalize;"><?= LOGGED_IN_USER['name']; ?></p>
-        </div>
-    </div>
+
+    <a href="dashboard" class="sidebar-brand">
+        <span class="brand-mark"><?= strtoupper(substr(SITE_NAME, 0, 1)) ?></span>
+        <span class="brand-text">
+            <span class="brand-name"><?= SITE_NAME ?></span>
+            <span class="brand-role">Admin panel</span>
+        </span>
+    </a>
+
+    <p class="nav-label">Menu</p>
 
     <ul class="nav">
         <?php
@@ -52,15 +47,13 @@ define('SIDEBAR_OPTIONS_ADMIN', [
                         <?= svg_icon($option['icon']) ?>
                         <span class="text"><?= $option['title'] ?></span>
                     </a>
-
                 <?php } else { ?>
-
                     <a href="<?= $url ?>" class="nav-link">
                         <div class="align-center">
                             <?= svg_icon($option['icon']) ?>
                             <span class="text"><?= $option['title'] ?></span>
                         </div>
-                        <?= svg_icon("angle-down")  ?>
+                        <?= svg_icon("angle-down") ?>
                     </a>
 
                     <ul class="sub-menu">
@@ -73,13 +66,22 @@ define('SIDEBAR_OPTIONS_ADMIN', [
                             </li>
                         <?php endforeach; ?>
                     </ul>
-
                 <?php } ?>
             </li>
-
-
-
         <?php endforeach; ?>
     </ul>
+
+    <div class="sidebar-foot">
+        <div class="user-info">
+            <div class="user-image-container">
+                <img src="../images/users/<?= LOGGED_IN_USER['image'] ?>" alt="" class="user-img">
+            </div>
+            <div class="user-meta">
+                <p class="user-name"><?= LOGGED_IN_USER['name'] ?></p>
+                <p class="user-mail"><?= LOGGED_IN_USER['email'] ?></p>
+            </div>
+        </div>
+        <a href="<?= _DIR_ ?>user/logout" class="sidebar-logout" title="Log out"><?= svg_icon("sign-out-alt") ?></a>
+    </div>
 
 </div>
