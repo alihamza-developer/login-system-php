@@ -70,6 +70,25 @@ function _add_index($table, $name, $definition)
     return true;
 }
 
+// Drop column if present
+function _drop_column($table, $column)
+{
+    global $db;
+    $exists = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'", ['select_query' => true]);
+    if (!count($exists)) return false;
+    $db->query("ALTER TABLE `$table` DROP COLUMN `$column`");
+    return true;
+}
+// Drop index if present
+function _drop_index($table, $name)
+{
+    global $db;
+    $exists = $db->query("SHOW INDEX FROM `$table` WHERE Key_name = '$name'", ['select_query' => true]);
+    if (!count($exists)) return false;
+    $db->query("ALTER TABLE `$table` DROP INDEX `$name`");
+    return true;
+}
+
 // Auth Tables
 $db->query("CREATE TABLE IF NOT EXISTS `sessions` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -94,15 +113,13 @@ $db->query("CREATE TABLE IF NOT EXISTS `auth_tokens` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `type` varchar(20) NOT NULL,
     `user_id` int(11) NULL DEFAULT NULL,
-    `identifier` varchar(190) NULL DEFAULT NULL,
     `token_hash` char(64) NOT NULL,
     `attempts` tinyint(4) NOT NULL DEFAULT 0,
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `expires_at` datetime NOT NULL,
     `used_at` timestamp NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_lookup` (`type`, `token_hash`),
-    KEY `idx_identifier` (`type`, `identifier`, `expires_at`)
+    KEY `idx_lookup` (`type`, `token_hash`)
   ) ENGINE=InnoDB;");
 
 $db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
@@ -123,3 +140,7 @@ _add_index('users', 'uq_email', "UNIQUE KEY `uq_email` (`email`)");
 // Backfill from the old columns
 $db->query("UPDATE `users` SET `role` = 'admin' WHERE `is_admin` = 1 AND `role` <> 'admin';");
 $db->query("UPDATE `users` SET `email_verified_at` = `date_added` WHERE `verify_status` = 1 AND `email_verified_at` IS NULL;");
+
+// Drop the unused otp identifier
+_drop_index('auth_tokens', 'idx_identifier');
+_drop_column('auth_tokens', 'identifier');

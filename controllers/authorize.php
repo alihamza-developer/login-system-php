@@ -58,90 +58,58 @@ if (isset($_POST['login'])) {
 }
 // Send Reset Password Link
 if (isset($_POST['send_reset_password_link'])) {
-	$email = $_POST['email'];
-	$user = $db->select_one('users', '*', ['email' => $email]);
-	if ($user) {
-		if ($user['verify_status'] != 1) {
-			echo error('Your account is not verified. First verify you account');
-			die();
-		}
-		$forgot_token = md5(time() . $user['id'] . rand(0, 999));
-		$token_expiry_date = date('Y-m-d h:i:s', strtotime(date('Y-m-d h:i:s') . " + 1 days"));
-		$update = $db->update('users', ['password_forgot_token' => $forgot_token, 'token_expiry_date' => $token_expiry_date], ['id' => $user['id']]);
-		if ($update) {
-			$_email->send([
-				'template' => 'forgot-email',
-				'to' => $email,
-				'vars' => [
-					'token' => $forgot_token,
-					'to' => $email,
+	$email = _POST('email', ['default' => '']);
 
-				]
-			]);
-			echo success('Reset Password link sent to your email. You can reset the password with in 24 hours');
-		}
-	} else {
-		echo error("You've entered the incorrect email address. Please try again.");
-	}
+	# Same reply either way, so the form cannot be used to find accounts
+	$generic = 'If that address has an account, a reset link is on its way.';
+
+	$user = $db->select_one('users', 'id,email,verify_status', ['email' => $email]);
+	if (!$user) returnSuccess($generic);
+	if ($user['verify_status'] != 1) returnSuccess($generic);
+
+	# Any earlier link stops working
+	$_token->revoke_all('reset', $user['id']);
+	$raw = $_token->create('reset', $user['id'], 3600);
+	if (!$raw) returnError('We could not create a reset link. Please try again.');
+
+	$_email->send([
+		'template' => 'forgot-email',
+		'to' => $email,
+		'vars' => [
+			'token' => $raw,
+			'to' => $email,
+		]
+	]);
+	returnSuccess($generic);
 }
 // Reset Password
 if (isset($_POST['reset_password'])) {
-	$variables = ['token', 'email', 'new_password', 'confirm_password'];
-	foreach ($variables as $value) {
-		if (!isset($_POST[$value])) {
-			echo error('Something is missing from that request. Please open the reset link again.');
-			die();
-		}
-	}
-	$token = $_POST['token'];
-	$email = $_POST['email'];
-	$new_password = $_POST['new_password'];
-	$confirm_password = $_POST['confirm_password'];
-
-	$invalid_link = 'That reset link is invalid or has expired. Please request a new one.';
-
-	$user = $db->select_one('users', '*', ['email' => $email]);
-	if (!$user) {
-		echo error($invalid_link);
-		die();
-	}
-
-	# Token must match
-	if (!hash_equals((string) $user['password_forgot_token'], (string) $token)) {
-		echo error($invalid_link);
-		die();
-	}
-
-	# Token must not be expired
-	$expiry_date = date("Y-m-d H:i:s", strtotime($user['token_expiry_date']));
-	$current_date = date("Y-m-d H:i:s");
-	if ($current_date >= $expiry_date) {
-		echo error($invalid_link);
-		die();
-	}
+	$token            = _POST('token', ['default' => '']);
+	$new_password     = _POST('new_password', ['default' => '']);
+	$confirm_password = _POST('confirm_password', ['default' => '']);
 
 	if (strlen($new_password) < AUTH_PASSWORD_MIN)
 		returnError('Password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
 
-	if ($new_password !== $confirm_password) {
-		echo error('Password is not matching');
-		die();
-	}
+	if ($new_password !== $confirm_password)
+		returnError('Password is not matching');
 
-	$password = password_hash($new_password, PASSWORD_BCRYPT);
-	$expiry_date = date('Y-m-d H:i:s', strtotime("-3 days"));
+	$row = $_token->verify('reset', $token);
+	if (!$row)
+		returnError('That reset link is invalid or has expired. Please request a new one.');
+
 	$update = $db->update('users', [
-		'password' => $password,
-		'token_expiry_date' => $expiry_date,
-	], ['id' => $user['id']]);
+		'password' => password_hash($new_password, AUTH_PASSWORD_ALGO),
+	], ['id' => $row['user_id']], ['encodeHtml' => false]);
 
-	if (!$update) {
-		echo error('We could not change your password. Please try again.');
-		die();
-	}
+	if (!$update)
+		returnError('We could not change your password. Please try again.');
 
-	echo success("Password changed successfully", [
+	# Burn the link and sign out every device
+	$_token->consume($row['id']);
+	$_session->revoke_all($row['user_id']);
+
+	returnSuccess('Password changed successfully', [
 		'redirect' => 'login?success=Password changed successfully'
 	]);
-	die();
 }

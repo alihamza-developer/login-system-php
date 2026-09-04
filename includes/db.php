@@ -7,6 +7,7 @@ require_once "Classes/Extension.php";
 require_once "Classes/Emails.php";
 require_once "Classes/Session.php";
 require_once "Classes/Auth.php";
+require_once "Classes/Token.php";
 require_once _DIR_ . "vendor/autoload.php";
 $timestamp = date('Y-m-d h:i:s');
 

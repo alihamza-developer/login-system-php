@@ -6,11 +6,8 @@ $CSS_FILES_[] = 'authorize.css';
 require_once "includes/head.php";
 
 # Verify User
-if (isset($_GET['verify']) && isset($_GET['token']) && isset($_GET['email'])) {
-    $token = $_GET['token'];
-    $email = $_GET['email'];
-
-    $res = verifyUserWithToken($email, $token);
+if (isset($_GET['verify']) && isset($_GET['token'])) {
+    $res = verifyUserWithToken($_GET['token']);
     $res = json_decode($res, true);
     $SCRIPT_ = js_msg($res['status'], $res['data']);
 }
