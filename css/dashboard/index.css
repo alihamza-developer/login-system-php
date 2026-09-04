@@ -352,6 +352,61 @@
     color: var(--mutedColor);
 }
 
+.setting-stack .device-list .device-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--lineColor);
+}
+
+.setting-stack .device-list .device-row:first-child {
+    padding-top: 0;
+}
+
+.setting-stack .device-list .device-row:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.setting-stack .device-row .device-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    background: var(--accentSoft);
+    border-radius: 10px;
+}
+
+.setting-stack .device-row .device-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--accentColor);
+}
+
+.setting-stack .device-row .device-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.setting-stack .device-row .device-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--inkColor);
+}
+
+.setting-stack .device-row .device-meta {
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: var(--mutedColor);
+}
+
 .setting-stack .form-actions {
     margin-top: 20px;
     padding-top: 20px;

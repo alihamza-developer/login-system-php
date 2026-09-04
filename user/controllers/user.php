@@ -54,3 +54,25 @@ if (isset($_POST['change_password'])) {
 	if (!$update) returnError('We could not change your password. Please try again.');
 	returnSuccess('Password changed successfully');
 }
+
+// Sign out one device
+if (isset($_POST['revoke_device'])) {
+	$device_id = (int) _POST('device_id', ['default' => 0]);
+
+	# Only sessions on this account
+	$mine = false;
+	foreach ($_session->devices(LOGGED_IN_USER_ID) as $device) {
+		if ((int) $device['id'] === $device_id) $mine = true;
+	}
+	if (!$mine) returnError('That device is not on your account.');
+
+	$_session->revoke($device_id);
+	returnSuccess('Signed out on that device', ['redirect' => 'refresh']);
+}
+
+// Sign out everywhere else
+if (isset($_POST['revoke_other_devices'])) {
+	$current = $_session->current();
+	$_session->revoke_all(LOGGED_IN_USER_ID, $current ? $current['id'] : null);
+	returnSuccess('Signed out on every other device', ['redirect' => 'refresh']);
+}

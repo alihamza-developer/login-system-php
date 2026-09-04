@@ -5,6 +5,10 @@ $page_name = 'Settings';
 require_once('./includes/head.php');
 
 $verified = LOGGED_IN_USER['verify_status'] == 1;
+
+$devices = $_session->devices(LOGGED_IN_USER_ID);
+$current = $_session->current();
+$current_id = $current ? (int) $current['id'] : 0;
 ?>
 <div class="page-head">
     <h1 class="page-title">Settings</h1>
@@ -102,6 +106,44 @@ $verified = LOGGED_IN_USER['verify_status'] == 1;
                     <button class="btn btn-primary" type="submit"><?= svg_icon('save') ?> Update password</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <p class="card-title">Devices</p>
+                <p class="card-note">Where you are signed in right now.</p>
+            </div>
+            <?php if (count($devices) > 1) { ?>
+                <button class="btn btn-ghost btn-sm jx-req-element" data-target="user" data-confirm="true"
+                    data-submit='{"revoke_other_devices": 1}'>Sign out everywhere else</button>
+            <?php } ?>
+        </div>
+
+        <div class="card-body">
+            <div class="device-list">
+                <?php foreach ($devices as $device) {
+                    $is_current = (int) $device['id'] === $current_id; ?>
+                    <div class="device-row">
+                        <span class="device-icon"><?= svg_icon('lock') ?></span>
+                        <div class="device-info">
+                            <p class="device-name">
+                                <?= browser_label($device['user_agent']) ?>
+                                <?php if ($is_current) { ?><span class="pill pill-ok">This device</span><?php } ?>
+                            </p>
+                            <p class="device-meta">
+                                <?= $device['ip'] ?: 'Unknown IP' ?> &middot;
+                                last active <?= date('j M Y, g:i a', strtotime($device['last_seen_at'])) ?>
+                            </p>
+                        </div>
+                        <?php if (!$is_current) { ?>
+                            <button class="icon-btn jx-req-element" title="Sign out this device" data-target="user" data-confirm="true"
+                                data-submit='{"revoke_device": 1, "device_id": <?= (int) $device['id'] ?>}'><?= svg_icon('times') ?></button>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+            </div>
         </div>
     </div>
 

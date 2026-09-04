@@ -14,6 +14,30 @@ function svg_icon($name, $size = "17", $color = "#000", $height = false)
     return $svg;
 }
 
+// Readable device name
+function browser_label($user_agent)
+{
+    if (!$user_agent) return 'Unknown device';
+
+    $browsers = ['Edg' => 'Edge', 'OPR' => 'Opera', 'Firefox' => 'Firefox', 'Chrome' => 'Chrome', 'Safari' => 'Safari'];
+    $systems = ['Windows' => 'Windows', 'Android' => 'Android', 'iPhone' => 'iPhone', 'iPad' => 'iPad', 'Mac OS' => 'macOS', 'Linux' => 'Linux'];
+
+    $browser = 'Unknown browser';
+    foreach ($browsers as $needle => $label) {
+        if (strpos($user_agent, $needle) !== false) {
+            $browser = $label;
+            break;
+        }
+    }
+    $system = '';
+    foreach ($systems as $needle => $label) {
+        if (strpos($user_agent, $needle) !== false) {
+            $system = $label;
+            break;
+        }
+    }
+    return $system ? "$browser on $system" : $browser;
+}
 // Global CSS Files
 function global_file($filename)
 {
