@@ -153,6 +153,11 @@
     color: var(--successColor);
 }
 
+.pill.pill-danger {
+    background: var(--dangerSoft);
+    color: var(--dangerColor);
+}
+
 .pill.pill-warn {
     background: var(--warningSoft);
     color: var(--warningColor);

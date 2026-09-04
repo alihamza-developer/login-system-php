@@ -20,6 +20,12 @@ define('SIDEBAR_OPTIONS_ADMIN', [
         'url' => 'settings',
     ],
     [
+        'title' => "Cron",
+        'description' => "Scheduled cleanup tasks",
+        'icon' => 'cog',
+        'url' => 'cron',
+    ],
+    [
         'title' => "Profile Setting",
         'description' => "Manage your profile settings",
         'icon' => 'user-cog',

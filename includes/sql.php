@@ -127,6 +127,20 @@ $db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
     KEY `idx_lookup` (`identifier`, `attempted_at`)
   ) ENGINE=InnoDB;");
 
+// Cron Table
+$db->query("CREATE TABLE IF NOT EXISTS `cron_jobs` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(60) NOT NULL,
+    `started_at` datetime NULL DEFAULT NULL,
+    `last_run_at` datetime NULL DEFAULT NULL,
+    `last_status` varchar(10) NOT NULL DEFAULT '',
+    `last_message` varchar(250) NOT NULL DEFAULT '',
+    `duration_ms` int(11) NOT NULL DEFAULT 0,
+    `runs` int(11) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_name` (`name`)
+  ) ENGINE=InnoDB;");
+
 // Auth User Columns
 _add_column('users', 'role', "varchar(50) NOT NULL DEFAULT 'user'");
 _add_column('users', 'phone', "varchar(32) NULL DEFAULT NULL");

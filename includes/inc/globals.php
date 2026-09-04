@@ -29,5 +29,6 @@ define('TABLES_WITHOUT_UID', [
     'meta_data',
     'sessions',
     'auth_tokens',
-    'auth_attempts'
+    'auth_attempts',
+    'cron_jobs'
 ]);
