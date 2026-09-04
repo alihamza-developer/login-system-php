@@ -34,7 +34,11 @@ if (isset($_POST['register_new_user'])) {
 	]);
 	if (!$add_user) returnError('We could not create your account. Please try again.');
 
-	sendVerifyToken($email);
+	# The account exists either way, so say which happened
+	$sent = json_decode(sendVerifyToken($email), true);
+	if (arr_val($sent, 'status') !== 'success')
+		returnError('Your account was created, but we could not send the verification email. Try signing in to request a new link.');
+
 	echo success('We sent a verfication link to your email. Please Verify your account');
 }
 // Login

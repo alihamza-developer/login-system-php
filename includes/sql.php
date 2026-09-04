@@ -41,9 +41,6 @@ if (_is("install_db_tables")) {
         `password` varchar(250) NOT NULL,
         `is_admin` tinyint(1) NOT NULL DEFAULT 0,
         `verify_status` int(1) NOT NULL DEFAULT 0,
-        `verify_token` varchar(250) NOT NULL,
-        `password_forgot_token` varchar(250) NOT NULL,
-        `token_expiry_date` timestamp NULL DEFAULT NULL,
         `date_added` timestamp NOT NULL DEFAULT current_timestamp(),
         `uid` varchar(250) NOT NULL,
         PRIMARY KEY (`id`)
@@ -144,3 +141,8 @@ $db->query("UPDATE `users` SET `email_verified_at` = `date_added` WHERE `verify_
 // Drop the unused otp identifier
 _drop_index('auth_tokens', 'idx_identifier');
 _drop_column('auth_tokens', 'identifier');
+
+// Drop the token columns replaced by auth_tokens
+_drop_column('users', 'verify_token');
+_drop_column('users', 'password_forgot_token');
+_drop_column('users', 'token_expiry_date');
