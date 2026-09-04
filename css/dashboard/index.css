@@ -304,6 +304,13 @@
     gap: 20px;
 }
 
+/* Cards wrapped in a form keep the same spacing */
+.setting-stack form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .setting-stack .setting-row {
     display: flex;
     align-items: flex-start;

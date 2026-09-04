@@ -21,7 +21,7 @@ if (isset($_POST['update_personal_information'])) {
 	];
 	// Upload avatar
 	$avatar = $_fn->upload_file("avatar", [
-		'path' => _DIR_ . "images/users/",
+		'path' => USERS_PATH,
 		'allowed_exts' => IMAGES_EXTS
 	]);
 	if ($avatar['status'] === 'success')

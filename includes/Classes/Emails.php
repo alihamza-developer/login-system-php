@@ -45,7 +45,7 @@ class Emails extends Database
     function get_template($name)
     {
         if (!isset(EMAILS[$name])) return null;
-        $file = _DIR_ . "includes/templates/{$name}.html";
+        $file = TEMPLATES_PATH . "{$name}.html";
         if (!is_file($file)) return null;
         return file_get_contents($file);
     }
@@ -122,6 +122,8 @@ class Emails extends Database
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
         try {
+            $secure = SMTP_SECURE;
+
             $mail->isSMTP();
             $mail->Host = SMTP_HOST;
             $mail->Port = SMTP_PORT;
@@ -129,7 +131,7 @@ class Emails extends Database
             $mail->Username = SMTP_USER;
             $mail->Password = SMTP_PASS;
             $mail->CharSet = 'UTF-8';
-            if (SMTP_SECURE) $mail->SMTPSecure = SMTP_SECURE;
+            if ($secure) $mail->SMTPSecure = $secure;
 
             $mail->setFrom(CONTACT_EMAIL, SITE_NAME);
             $mail->addAddress($data['to'], arr_val($data, 'to_name', ''));

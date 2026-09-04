@@ -14,6 +14,12 @@ define('SIDEBAR_OPTIONS_ADMIN', [
         'url' => 'users',
     ],
     [
+        'title' => "Settings",
+        'description' => "Site name, contact email and mail settings",
+        'icon' => 'cog',
+        'url' => 'settings',
+    ],
+    [
         'title' => "Profile Setting",
         'description' => "Manage your profile settings",
         'icon' => 'user-cog',

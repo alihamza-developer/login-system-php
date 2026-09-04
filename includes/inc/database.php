@@ -392,4 +392,6 @@ class Database
 $db = new Database();
 
 require_once("functions2.php");
+require_once(_DIR_ . "includes/Classes/Settings.php");
+require_once("globals.php");
 require_once("site-setting.php");

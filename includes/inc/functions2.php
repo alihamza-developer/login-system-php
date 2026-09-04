@@ -41,6 +41,10 @@ function assets_file($file, $type, $attach_path = null)
         $attach_path = is_null($attach_path) ? '' : $attach_path;
         $file = merge_path($attach_path, $file);
     }
+    # Our own full urls still need the cache buster
+    elseif (strpos($file, SITE_URL) === 0 && strpos($file, '?') === false) {
+        $file .= ASSETS_V;
+    }
     if ($type === 'css') {
         echo "
         <link rel='stylesheet' href='$file'>";
@@ -49,6 +53,34 @@ function assets_file($file, $type, $attach_path = null)
             <script src='$file'></script>";
     }
 }
+
+// Load Assets Template Fn
+function add_assets_template($template_names, $position = 'first')
+{
+    global $ASSETS_TEPLATES_, $CSS_FILES_, $JS_FILES_;
+
+    $template_names = explode(',', $template_names);
+
+    foreach ($template_names as $template_name) {
+
+        $template = arr_val($ASSETS_TEPLATES_, $template_name);
+
+        if (!$template) return false;
+        $css = arr_val($template, 'css', []);
+        $js = arr_val($template, 'js', []);
+        foreach ($css as $file) {
+            if ($position == 'first') array_unshift($CSS_FILES_, $file);
+            else $CSS_FILES_[] = $file;
+        }
+        foreach ($js as $file) {
+            if ($position == 'first') array_unshift($JS_FILES_, $file);
+            else $JS_FILES_[] = $file;
+        }
+    }
+
+    return true;
+}
+
 // show message page
 function showMsgPage($options)
 {
