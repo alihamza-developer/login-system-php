@@ -70,7 +70,8 @@ if (isset($_POST['login'])) {
 	$_guard->clear($key_user);
 	$_guard->clear($key_ip);
 
-	if (!$_auth->login($user['id']))
+	$remember = _POST('remember', ['default' => '']) !== '';
+	if (!$_auth->login($user['id'], $remember))
 		returnError('We could not sign you in. Please try again.');
 
 	echo success('logged in successfully', [

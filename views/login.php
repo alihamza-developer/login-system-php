@@ -42,7 +42,11 @@ if (isset($_GET['success'])) {
                     <span class="input-group-text"><?= svg_icon("lock") ?></span>
                     <input type="password" id="password" name="password" class="form-control" placeholder="Your password" autocomplete="current-password" required>
                 </div>
-                <span class="field-hint"><a href="forgot">Forgot password?</a></span>
+            </div>
+
+            <div class="auth-meta">
+                <input type="checkbox" class="fancy-checkbox" name="remember" value="1" data-label="Remember me">
+                <a href="forgot" class="auth-link">Forgot password?</a>
             </div>
 
             <input type="hidden" name="login" value="true">

@@ -21,6 +21,12 @@ class Session
         return ENV === 'local' ? 'sid' : '__Host-sid';
     }
 
+    # Remember cookie name
+    public function remember_name()
+    {
+        return ENV === 'local' ? 'rmb' : '__Host-rmb';
+    }
+
     # Clear cache
     public function reset()
     {
@@ -45,24 +51,54 @@ class Session
         $this->resolved = true;
 
         $raw = $this->raw_token();
+        if ($raw && preg_match('/^[a-f0-9]{64}$/', $raw)) {
+            $hash = hash('sha256', $raw);
+            $rows = $this->db->query("SELECT * FROM `sessions` WHERE `token_hash` = '$hash' AND `revoked_at` IS NULL LIMIT 1", ['select_query' => true]);
+            $row = count($rows) ? $rows[0] : null;
+
+            if ($row) {
+                $now = time();
+                $expired = $now > strtotime($row['expires_at']);
+                $idle = ($now - strtotime($row['last_seen_at'])) > AUTH_SESSION_IDLE;
+
+                if (!$expired && !$idle) {
+                    $this->db->update('sessions', ['last_seen_at' => date('Y-m-d H:i:s')], ['id' => $row['id']]);
+                    $this->row = $row;
+                    return $row;
+                }
+                $this->revoke($row['id']);
+            }
+        }
+
+        # Fall back to a remembered device
+        $this->row = $this->resume_remembered();
+        $this->resolved = true;
+        return $this->row;
+    }
+
+    # Restore from a remember cookie
+    private function resume_remembered()
+    {
+        $name = $this->remember_name();
+        $raw = isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
         if (!$raw || !preg_match('/^[a-f0-9]{64}$/', $raw)) return null;
 
         $hash = hash('sha256', $raw);
-        $rows = $this->db->query("SELECT * FROM `sessions` WHERE `token_hash` = '$hash' AND `revoked_at` IS NULL LIMIT 1", ['select_query' => true]);
-        $row = count($rows) ? $rows[0] : null;
-        if (!$row) return null;
-
-        $now = time();
-        $expired = $now > strtotime($row['expires_at']);
-        $idle = ($now - strtotime($row['last_seen_at'])) > AUTH_SESSION_IDLE;
-        if ($expired || $idle) {
-            $this->revoke($row['id']);
+        $now = date('Y-m-d H:i:s');
+        $rows = $this->db->query("SELECT * FROM `sessions` WHERE `remember_hash` = '$hash' AND `revoked_at` IS NULL AND `remember_expires_at` > '$now' LIMIT 1", ['select_query' => true]);
+        if (!count($rows)) {
+            $this->clear_remember_cookie();
             return null;
         }
+        $old = $rows[0];
 
-        $this->db->update('sessions', ['last_seen_at' => date('Y-m-d H:i:s')], ['id' => $row['id']]);
-        $this->row = $row;
-        return $row;
+        # One use per token, then issue a fresh pair
+        $this->revoke($old['id']);
+        $new = $this->create($old['user_id'], true);
+        if (!$new) return null;
+
+        $rows = $this->db->query("SELECT * FROM `sessions` WHERE `token_hash` = '" . hash('sha256', $new) . "' LIMIT 1", ['select_query' => true]);
+        return count($rows) ? $rows[0] : null;
     }
 
     # Current session
@@ -75,7 +111,7 @@ class Session
     public function create($user_id, $remember = false)
     {
         $raw = bin2hex(random_bytes(32));
-        $id = $this->db->insert('sessions', [
+        $data = [
             'user_id' => $user_id,
             'token_hash' => hash('sha256', $raw),
             'csrf_token' => bin2hex(random_bytes(32)),
@@ -84,10 +120,20 @@ class Session
             'created_at' => date('Y-m-d H:i:s'),
             'last_seen_at' => date('Y-m-d H:i:s'),
             'expires_at' => date('Y-m-d H:i:s', time() + AUTH_SESSION_ABSOLUTE),
-        ], ['encodeHtml' => false]);
+        ];
+
+        $remember_raw = null;
+        if ($remember) {
+            $remember_raw = bin2hex(random_bytes(32));
+            $data['remember_hash'] = hash('sha256', $remember_raw);
+            $data['remember_expires_at'] = date('Y-m-d H:i:s', time() + AUTH_REMEMBER_LIFETIME);
+        }
+
+        $id = $this->db->insert('sessions', $data, ['encodeHtml' => false]);
         if (!$id) return false;
 
         $this->send_cookie($raw);
+        if ($remember_raw) $this->send_remember_cookie($remember_raw);
         $this->reset();
         return $raw;
     }
@@ -141,12 +187,14 @@ class Session
         $row = $this->resolve();
         if ($row) $this->revoke($row['id']);
         $this->clear_cookie();
+        $this->clear_remember_cookie();
         $this->reset();
     }
 
     # Write cookie
     private function send_cookie($raw)
     {
+        $_COOKIE[$this->cookie_name()] = $raw;
         if (PHP_SAPI === 'cli' || headers_sent()) return;
         setcookie($this->cookie_name(), $raw, [
             'expires' => 0,
@@ -160,8 +208,37 @@ class Session
     # Clear cookie
     private function clear_cookie()
     {
+        unset($_COOKIE[$this->cookie_name()]);
         if (PHP_SAPI === 'cli' || headers_sent()) return;
         setcookie($this->cookie_name(), '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => ENV !== 'local',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+
+    # Write remember cookie
+    private function send_remember_cookie($raw)
+    {
+        $_COOKIE[$this->remember_name()] = $raw;
+        if (PHP_SAPI === 'cli' || headers_sent()) return;
+        setcookie($this->remember_name(), $raw, [
+            'expires' => time() + AUTH_REMEMBER_LIFETIME,
+            'path' => '/',
+            'secure' => ENV !== 'local',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+
+    # Clear remember cookie
+    private function clear_remember_cookie()
+    {
+        unset($_COOKIE[$this->remember_name()]);
+        if (PHP_SAPI === 'cli' || headers_sent()) return;
+        setcookie($this->remember_name(), '', [
             'expires' => time() - 3600,
             'path' => '/',
             'secure' => ENV !== 'local',

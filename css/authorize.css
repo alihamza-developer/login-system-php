@@ -161,6 +161,25 @@
     color: var(--dangerColor);
 }
 
+.authorize-page .auth-card .auth-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: -4px 0 18px;
+}
+
+.authorize-page .auth-card .auth-meta .auth-link {
+    font-size: 13px;
+    color: var(--mutedColor);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.authorize-page .auth-card .auth-meta .auth-link:hover {
+    color: var(--accentColor);
+}
+
 .authorize-page .auth-card .field-hint {
     display: block;
     margin: 7px 0 0;
