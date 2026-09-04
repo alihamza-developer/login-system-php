@@ -282,6 +282,11 @@ class Database
 	# Update data
 	public function update($table, $data = [], $condition = [], $options = [])
 	{
+		# No condition would rewrite every row
+		if (empty($condition) && !arr_val($options, "allow_all", false)) {
+			error_log("update on `$table` refused: no condition given");
+			return false;
+		}
 		$return_query = arr_val($options, "query");
 		$where_condition = $this->get("whereQuery", ['condition' => $condition]);
 		$options['data'] = $data;
@@ -297,6 +302,11 @@ class Database
 	# Delete Data
 	public function delete($table, $condition = [], $data = [])
 	{
+		# No condition would empty the whole table
+		if (empty($condition) && !arr_val($data, "allow_all", false)) {
+			error_log("delete on `$table` refused: no condition given");
+			return false;
+		}
 		$return_query = arr_val($data, "query");
 		$data['condition'] = $condition;
 		$where_condition = $this->get("whereQuery", $data);
