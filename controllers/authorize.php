@@ -1,6 +1,9 @@
 <?php
 define('DIR', '../');
 require_once(DIR . 'includes/db.php');
+
+# Every post must carry the csrf token
+$_guard->verify_csrf();
 require_once _DIR_ . "includes/Classes/Emails.php";
 // Sign Up
 if (isset($_POST['register_new_user'])) {
@@ -39,8 +42,19 @@ if (isset($_POST['login'])) {
 	$email    = _POST('email');
 	$password = _POST('password');
 
+	$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
+	$key_user = 'login:' . strtolower($email);
+	$key_ip   = 'login:ip:' . $ip;
+
+	# Slow down password guessing
+	if (!$_guard->throttle($key_user, 5, 900) || !$_guard->throttle($key_ip, 20, 900))
+		returnError('Too many sign-in attempts. Please try again in 15 minutes.');
+
 	$user = $_auth->attempt($email, $password);
 	if (!$user) {
+		$_guard->hit($key_user);
+		$_guard->hit($key_ip);
+
 		# Unverified accounts can resend
 		if ($_auth->fail_reason() === 'unverified') {
 			$resend = 'action?type=verify-email&email=' . urlencode($email);
@@ -48,6 +62,9 @@ if (isset($_POST['login'])) {
 		}
 		returnError('Email or Password is wrong. Please Try with a valid email and password');
 	}
+
+	$_guard->clear($key_user);
+	$_guard->clear($key_ip);
 
 	if (!$_auth->login($user['id']))
 		returnError('We could not sign you in. Please try again.');
@@ -62,6 +79,11 @@ if (isset($_POST['send_reset_password_link'])) {
 
 	# Same reply either way, so the form cannot be used to find accounts
 	$generic = 'If that address has an account, a reset link is on its way.';
+
+	# Cap reset emails per address, same reply either way
+	$reset_key = 'reset:' . strtolower($email);
+	if (!$_guard->throttle($reset_key, 3, 3600)) returnSuccess($generic);
+	$_guard->hit($reset_key);
 
 	$user = $db->select_one('users', 'id,email,verify_status', ['email' => $email]);
 	if (!$user) returnSuccess($generic);

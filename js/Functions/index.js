@@ -1,3 +1,9 @@
+// Send the csrf token with every ajax call
+let CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content') || '';
+$(document).ajaxSend(function (e, xhr) {
+    if (CSRF_TOKEN) xhr.setRequestHeader('X-CSRF-TOKEN', CSRF_TOKEN);
+});
+
 // Callback Functions
 const fn = {
     // callbacks

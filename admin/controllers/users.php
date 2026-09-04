@@ -2,6 +2,9 @@
 define('DIR', '../');
 require_once('../includes/db.php');
 
+# Every post must carry the csrf token
+$_guard->verify_csrf();
+
 // Modify User admin role
 if (isset($_POST['modifyUserIsAdmin'])) {
     $is_admin = $_POST['modifyUserIsAdmin'] == "true" ? 1 : 0;

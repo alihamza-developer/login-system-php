@@ -2,6 +2,9 @@
 define('DIR', '../');
 require_once(DIR . 'includes/db.php');
 
+# Every post must carry the csrf token
+$_guard->verify_csrf();
+
 # Must be signed in
 if (!LOGGED_IN_USER) returnError('You need to be signed in to do that.');
 
