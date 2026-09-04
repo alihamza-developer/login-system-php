@@ -1,0 +1,102 @@
+/* #region Dropdown */
+
+.dropdown-toggle.no-arrow-icon::after {
+    content: none !important;
+}
+
+.dropdown-menu {
+    min-width: 232px;
+    padding: 6px;
+    margin-top: 8px;
+    background: var(--surfaceColor);
+    border: 1px solid var(--lineColor);
+    border-radius: 14px;
+    box-shadow: 0 4px 6px -2px rgba(16, 24, 40, .03), 0 12px 28px -4px rgba(16, 24, 40, .12);
+}
+
+.dropdown-menu.show {
+    animation: dropdownIn .14s ease-out;
+}
+
+/* Who is signed in */
+.dropdown-menu .dropdown-user {
+    padding: 8px 10px 10px;
+}
+
+.dropdown-menu .dropdown-user .user-name {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--inkColor);
+}
+
+.dropdown-menu .dropdown-user .user-mail {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--mutedColor);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-menu .dropdown-divider {
+    margin: 4px -6px 6px;
+    border-top: 1px solid var(--lineColor);
+}
+
+.dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    font-size: 13.5px;
+    color: var(--inkColor);
+    border-radius: 9px;
+    transition: background .12s ease, color .12s ease;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background: var(--accentSoft);
+    color: var(--accentHover);
+}
+
+.dropdown-menu .dropdown-item.active,
+.dropdown-menu .dropdown-item:active {
+    background: var(--accentSoft);
+    color: var(--accentHover);
+}
+
+.dropdown-menu .dropdown-item.is-danger:hover,
+.dropdown-menu .dropdown-item.is-danger:focus {
+    background: var(--dangerSoft);
+    color: var(--dangerColor);
+}
+
+.dropdown-menu .dropdown-item svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    fill: currentColor;
+    opacity: .75;
+}
+
+.dropdown-menu .dropdown-item .text {
+    margin: 0;
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* #endregion Dropdown */
