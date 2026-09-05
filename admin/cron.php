@@ -19,7 +19,6 @@ function every_label($seconds)
 ?>
 <div class="page-head">
     <h1 class="page-title">Cron</h1>
-    <p class="page-sub">Scheduled cleanup tasks. Run by <code>php cron/index.php</code>.</p>
 </div>
 
 <div class="setting-stack">
