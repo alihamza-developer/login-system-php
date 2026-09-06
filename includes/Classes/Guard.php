@@ -99,24 +99,24 @@ class Guard
     }
 
     # Require login
-    public function require_login()
+    public function require_login($login_url = null)
     {
         if ($this->auth->check()) return;
         $continue = isset($_SERVER['REQUEST_URI']) ? urlencode($_SERVER['REQUEST_URI']) : '';
-        redirectTo(url('login?continue=' . $continue));
+        redirectTo(($login_url ?: url('login')) . '?continue=' . $continue);
     }
 
     # Require guest
-    public function require_guest()
+    public function require_guest($to = null)
     {
         if (!$this->auth->check()) return;
-        redirectTo(url('user/dashboard'));
+        redirectTo($to ?: url('user/dashboard'));
     }
 
     # Require role
-    public function require_role($role)
+    public function require_role($role, $login_url = null)
     {
-        $this->require_login();
+        $this->require_login($login_url);
         if ($this->auth->is($role)) return;
         http_response_code(403);
         errorMsgPage('You do not have access to that page.');

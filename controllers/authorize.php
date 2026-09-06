@@ -67,6 +67,14 @@ if (isset($_POST['login'])) {
 		returnError('Email or Password is wrong. Please Try with a valid email and password');
 	}
 
+	# The admin form only accepts admins
+	$admin_only = _POST('require_admin', ['default' => '']) !== '';
+	if ($admin_only && $user['role'] !== 'admin') {
+		$_guard->hit($key_user);
+		$_guard->hit($key_ip);
+		returnError('This account does not have admin access.');
+	}
+
 	$_guard->clear($key_user);
 	$_guard->clear($key_ip);
 
@@ -75,7 +83,7 @@ if (isset($_POST['login'])) {
 		returnError('We could not sign you in. Please try again.');
 
 	echo success('logged in successfully', [
-		'redirect' => 'user/dashboard'
+		'redirect' => $admin_only ? url('admin/dashboard') : 'user/dashboard'
 	]);
 }
 // Send Reset Password Link
