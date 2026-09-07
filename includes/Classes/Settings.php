@@ -21,12 +21,21 @@ class Settings
     }
 
     # Load all
+    # Load all
     public function all()
     {
         if ($this->cache !== null) return $this->cache;
-        $rows = $this->db->select('meta_data', ['meta_key', 'meta_value', 'meta_json']);
-        if (!is_array($rows)) $rows = [];
         $this->cache = [];
+
+        try {
+            $rows = $this->db->select('meta_data', ['meta_key', 'meta_value', 'meta_json']);
+        } catch (\mysqli_sql_exception $e) {
+            # Table missing, not installed
+            if ($e->getCode() != 1146) throw $e;
+            return $this->cache;
+        }
+
+        if (!is_array($rows)) $rows = [];
         foreach ($rows as $row) {
             $json = $row['meta_json'];
             $value = $json !== '' ? json_decode($json, true) : $this->decrypt($row['meta_value']);

@@ -7,17 +7,17 @@ require_once "inc/database.php";
 // Check if action is already done
 function _is($type)
 {
-    global $db;
-    $data = $db->select_one("meta_data", "id", [
-        "meta_key" => "tmp_scripts",
-        "meta_value" => $type
-    ]);
-    if ($data) return false;
-    $db->insert('meta_data', [
-        'meta_key' => 'tmp_scripts',
-        'meta_value' => $type
-    ]);
-    return true;
+  global $db;
+  $data = $db->select_one("meta_data", "id", [
+    "meta_key" => "tmp_scripts",
+    "meta_value" => $type
+  ]);
+  if ($data) return false;
+  $db->insert('meta_data', [
+    'meta_key' => 'tmp_scripts',
+    'meta_value' => $type
+  ]);
+  return true;
 }
 
 # Meta Data Table
