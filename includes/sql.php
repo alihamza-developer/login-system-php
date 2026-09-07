@@ -20,7 +20,7 @@ function _is($type)
     return true;
 }
 
-// Meta Data Table
+# Meta Data Table
 $db->query("CREATE TABLE IF NOT EXISTS `meta_data` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `meta_key` varchar(250) NOT NULL,
@@ -28,65 +28,28 @@ $db->query("CREATE TABLE IF NOT EXISTS `meta_data` (
     `meta_json` text NOT NULL,
     `time` timestamp NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB;");
-// DB Tables
-if (_is("install_db_tables")) {
-    $db->query("CREATE TABLE IF NOT EXISTS `users` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `fname` varchar(250) NOT NULL,
-        `lname` varchar(250) NOT NULL,
-        `name` varchar(250) NOT NULL,
-        `email` varchar(250) NOT NULL,
-        `image` varchar(250) NOT NULL,
-        `password` varchar(250) NOT NULL,
-        `is_admin` tinyint(1) NOT NULL DEFAULT 0,
-        `verify_status` int(1) NOT NULL DEFAULT 0,
-        `date_added` timestamp NOT NULL DEFAULT current_timestamp(),
-        `uid` varchar(250) NOT NULL,
-        PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB;");
-}
+  ) ENGINE=InnoDB;");
 
+# Users Table
+$db->query("CREATE TABLE IF NOT EXISTS `users` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `fname` varchar(250) NOT NULL,
+    `lname` varchar(250) NOT NULL,
+    `name` varchar(250) NOT NULL,
+    `email` varchar(250) NOT NULL,
+    `phone` varchar(32) NULL DEFAULT NULL,
+    `image` varchar(250) NOT NULL,
+    `password` varchar(250) NOT NULL,
+    `role` varchar(50) NOT NULL DEFAULT 'user',
+    `email_verified_at` timestamp NULL DEFAULT NULL,
+    `phone_verified_at` timestamp NULL DEFAULT NULL,
+    `date_added` timestamp NOT NULL DEFAULT current_timestamp(),
+    `uid` varchar(250) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_email` (`email`)
+  ) ENGINE=InnoDB;");
 
-// Add column if missing
-function _add_column($table, $column, $definition)
-{
-    global $db;
-    $exists = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'", ['select_query' => true]);
-    if (count($exists)) return false;
-    $db->query("ALTER TABLE `$table` ADD `$column` $definition");
-    return true;
-}
-// Add index if missing
-function _add_index($table, $name, $definition)
-{
-    global $db;
-    $exists = $db->query("SHOW INDEX FROM `$table` WHERE Key_name = '$name'", ['select_query' => true]);
-    if (count($exists)) return false;
-    $db->query("ALTER TABLE `$table` ADD $definition");
-    return true;
-}
-
-// Drop column if present
-function _drop_column($table, $column)
-{
-    global $db;
-    $exists = $db->query("SHOW COLUMNS FROM `$table` LIKE '$column'", ['select_query' => true]);
-    if (!count($exists)) return false;
-    $db->query("ALTER TABLE `$table` DROP COLUMN `$column`");
-    return true;
-}
-// Drop index if present
-function _drop_index($table, $name)
-{
-    global $db;
-    $exists = $db->query("SHOW INDEX FROM `$table` WHERE Key_name = '$name'", ['select_query' => true]);
-    if (!count($exists)) return false;
-    $db->query("ALTER TABLE `$table` DROP INDEX `$name`");
-    return true;
-}
-
-// Auth Tables
+# Sessions Table
 $db->query("CREATE TABLE IF NOT EXISTS `sessions` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `user_id` int(11) NOT NULL,
@@ -106,6 +69,7 @@ $db->query("CREATE TABLE IF NOT EXISTS `sessions` (
     KEY `idx_remember` (`remember_hash`)
   ) ENGINE=InnoDB;");
 
+# Auth Tokens Table
 $db->query("CREATE TABLE IF NOT EXISTS `auth_tokens` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `type` varchar(20) NOT NULL,
@@ -119,6 +83,7 @@ $db->query("CREATE TABLE IF NOT EXISTS `auth_tokens` (
     KEY `idx_lookup` (`type`, `token_hash`)
   ) ENGINE=InnoDB;");
 
+# Auth Attempts Table
 $db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `identifier` varchar(190) NOT NULL,
@@ -127,7 +92,7 @@ $db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
     KEY `idx_lookup` (`identifier`, `attempted_at`)
   ) ENGINE=InnoDB;");
 
-// Cron Table
+# Cron Table
 $db->query("CREATE TABLE IF NOT EXISTS `cron_jobs` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(60) NOT NULL,
@@ -140,23 +105,3 @@ $db->query("CREATE TABLE IF NOT EXISTS `cron_jobs` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uq_name` (`name`)
   ) ENGINE=InnoDB;");
-
-// Auth User Columns
-_add_column('users', 'role', "varchar(50) NOT NULL DEFAULT 'user'");
-_add_column('users', 'phone', "varchar(32) NULL DEFAULT NULL");
-_add_column('users', 'email_verified_at', "timestamp NULL DEFAULT NULL");
-_add_column('users', 'phone_verified_at', "timestamp NULL DEFAULT NULL");
-_add_index('users', 'uq_email', "UNIQUE KEY `uq_email` (`email`)");
-
-// Backfill from the old columns
-$db->query("UPDATE `users` SET `role` = 'admin' WHERE `is_admin` = 1 AND `role` <> 'admin';");
-$db->query("UPDATE `users` SET `email_verified_at` = `date_added` WHERE `verify_status` = 1 AND `email_verified_at` IS NULL;");
-
-// Drop the unused otp identifier
-_drop_index('auth_tokens', 'idx_identifier');
-_drop_column('auth_tokens', 'identifier');
-
-// Drop the token columns replaced by auth_tokens
-_drop_column('users', 'verify_token');
-_drop_column('users', 'password_forgot_token');
-_drop_column('users', 'token_expiry_date');
