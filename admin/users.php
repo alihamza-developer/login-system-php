@@ -82,7 +82,7 @@ foreach ($users as $user) {
                                 <?php } ?>
                             </td>
                             <td>
-                                <input type="checkbox" class="fancy-checkbox jx-req-element" data-submit='{"user_id": "<?= $user['id'] ?>"}' data-target="users" name="modifyUserIsAdmin" <?= $user['is_admin'] == "1" ? "checked" : "" ?>>
+                                <input type="checkbox" class="fancy-checkbox jx-req-element" data-submit='{"user_id": "<?= $user['id'] ?>"}' data-target="users" name="modifyUserIsAdmin" <?= $user['role'] == "admin" ? "checked" : "" ?>>
                             </td>
                             <td class="row-action">
                                 <button class="icon-btn delete-btn" title="Delete user" data-target="<?= $user['id'] ?>" data-action="user">

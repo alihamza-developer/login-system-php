@@ -41,6 +41,7 @@ $db->query("CREATE TABLE IF NOT EXISTS `users` (
     `image` varchar(250) NOT NULL,
     `password` varchar(250) NOT NULL,
     `role` varchar(50) NOT NULL DEFAULT 'user',
+    `verify_status` tinyint(1) NOT NULL DEFAULT 0,
     `email_verified_at` timestamp NULL DEFAULT NULL,
     `phone_verified_at` timestamp NULL DEFAULT NULL,
     `date_added` timestamp NOT NULL DEFAULT current_timestamp(),

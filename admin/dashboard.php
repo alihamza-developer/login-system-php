@@ -9,10 +9,10 @@ $week_ago = date('Y-m-d H:i:s', strtotime('-7 days'));
 $total_users = $db->count('users', []);
 $verified_users = $db->count('users', ['verify_status' => 1]);
 $unverified_users = $total_users - $verified_users;
-$admin_users = $db->count('users', ['is_admin' => 1]);
+$admin_users = $db->count('users', ['role' => 'admin']);
 $new_users = (int) $db->query("SELECT COUNT(1) c FROM `users` WHERE `date_added` > '$week_ago'", ['select_query' => true])[0]['c'];
 
-$recent = $db->query("SELECT `name`, `email`, `image`, `is_admin`, `verify_status`, `date_added` FROM `users` ORDER BY `id` DESC LIMIT 6", ['select_query' => true]);
+$recent = $db->query("SELECT `name`, `email`, `image`,`role`, `verify_status`, `date_added` FROM `users` ORDER BY `id` DESC LIMIT 6", ['select_query' => true]);
 ?>
 <div class="page-head">
     <h1 class="page-title">Admin dashboard</h1>
@@ -77,8 +77,8 @@ $recent = $db->query("SELECT `name`, `email`, `image`, `is_admin`, `verify_statu
                             </div>
                         </td>
                         <td>
-                            <span class="pill <?= $user['is_admin'] == 1 ? 'pill-accent' : 'pill-muted' ?>">
-                                <?= $user['is_admin'] == 1 ? 'Admin' : 'Member' ?>
+                            <span class="pill <?= $user['role'] == 'admin' ? 'pill-accent' : 'pill-muted' ?>">
+                                <?= $user['role'] == 'admin' ? 'Admin' : 'Member' ?>
                             </span>
                         </td>
                         <td>
