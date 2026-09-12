@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 class Extension
 {
     private $path = 'extensions';
@@ -13,6 +15,18 @@ class Extension
 
         if (strlen($path) > 0) $this->path = $path;
         $this->path = merge_path($this->main_dir, $this->path);
+        $this->register_defaults();
+    }
+
+
+    # The runners that ship with the site
+    private function register_defaults()
+    {
+        # E.g
+        // $this->register_extension('python', 'compress-image', [
+        //     'filename' => 'compress-image.py',
+        //     'command' => 'python _{{filename}}_',
+        // ]);
     }
 
     private function get_temp_folder_path()
@@ -44,31 +58,30 @@ class Extension
         $filename = arr_val($data, 'filename');
         $command = arr_val($data, 'command');
 
-        if (!$filename) 
-            throw new Error("Parameter 'filename' is required");
-        
+        if (!$filename)
+            throw new \Error("Parameter 'filename' is required");
 
-        if (!$command) 
-            throw new Error("Parameter 'command' is required");
-        
+
+        if (!$command)
+            throw new \Error("Parameter 'command' is required");
+
 
         $langauge_dir = merge_path($this->path, $langauge);
 
         if (!$this->is_language_exists($langauge)) {
-            if (!is_dir($langauge_dir)) 
-                throw new Error("'$langauge' directory does'nt exist");
-             else 
+            if (!is_dir($langauge_dir))
+                throw new \Error("'$langauge' directory does'nt exist");
+            else
                 $this->extensions[$langauge] = [];
-            
         }
 
         if ($this->is_extension_exists($langauge, $extension_name)) {
-            throw new Error("Extension '$extension_name' already exists in language '$langauge'");
+            throw new \Error("Extension '$extension_name' already exists in language '$langauge'");
         }
 
-        if (!file_exists(merge_path($langauge_dir, $filename))) 
-            throw new Error("File '$filename' not found");
-         else {
+        if (!file_exists(merge_path($langauge_dir, $filename)))
+            throw new \Error("File '$filename' not found");
+        else {
             $file_info = get_file_info($filename);
 
             $this->extensions[$langauge][$extension_name] = [
@@ -84,11 +97,11 @@ class Extension
     {
         list($langauge_name, $extension_name) = explode('::', $extension_name);
 
-        if (!$this->is_language_exists($langauge_name)) throw new Error("Language '$langauge_name' not found");
-        
+        if (!$this->is_language_exists($langauge_name)) throw new \Error("Language '$langauge_name' not found");
 
-        if (!$this->is_extension_exists($langauge_name, $extension_name)) throw new Error("Extension '$extension_name' not found in language '$langauge_name'");
-        
+
+        if (!$this->is_extension_exists($langauge_name, $extension_name)) throw new \Error("Extension '$extension_name' not found in language '$langauge_name'");
+
 
         $extension_data = $this->extensions[$langauge_name][$extension_name];
 
@@ -129,7 +142,7 @@ class Extension
         );
 
         if (ENV != 'local') $command = str_replace('python', 'python', $command);
-        
+
 
         $current_dir = getcwd();
 
@@ -139,16 +152,7 @@ class Extension
 
         chdir($current_dir);
         if ($delete_file) unlink($temp_file_path);
-        
+
         return $response;
     }
 }
-
-$_ext = new Extension();
-
-// Register extensions here
-
-$_ext->register_extension('python', 'compress-image', [
-    'filename' => 'compress-image.py',
-    'command' => 'python _{{filename}}_',
-]);

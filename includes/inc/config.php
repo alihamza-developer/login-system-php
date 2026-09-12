@@ -16,6 +16,11 @@ define('AUTH_PERMISSIONS', [
     'user'  => ['profile.edit'],
 ]);
 
+# Guest
+define('GUEST_LIFETIME', 2592000); # 30 days sliding
+define('GUEST_TOUCH_AFTER', 3600); # Slide at most hourly
+define('GUEST_AUTO_START', true); # Identity on first visit
+
 $CSS_FILES_ = [];
 $JS_FILES_ = [];
 $SCRIPT_ = '';

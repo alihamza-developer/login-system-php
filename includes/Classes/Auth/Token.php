@@ -2,6 +2,9 @@
 
 namespace Auth;
 
+use Core\App;
+
+
 class Token
 {
     private $db;
@@ -9,8 +12,7 @@ class Token
     # Constructor
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = App::db();
     }
 
     # Create token
@@ -65,5 +67,3 @@ class Token
         ]);
     }
 }
-
-$_token = new Token();

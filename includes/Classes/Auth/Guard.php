@@ -2,6 +2,8 @@
 
 namespace Auth;
 
+use Core\App;
+
 class Guard
 {
     private $db;
@@ -12,10 +14,9 @@ class Guard
     # Constructor
     public function __construct()
     {
-        global $db, $_auth, $_session;
-        $this->db = $db;
-        $this->auth = $_auth;
-        $this->session = $_session;
+        $this->db = App::db();
+        $this->auth = App::auth();
+        $this->session = App::session();
     }
 
     # Under the limit
@@ -88,6 +89,10 @@ class Guard
     # Check csrf
     public function verify_csrf()
     {
+        # Only a write carries a token, reads come over GET
+        $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+        if ($method !== 'POST') return;
+
         $sent = isset($_POST['_csrf']) ? $_POST['_csrf'] : '';
         if ($sent === '' && isset($_SERVER['HTTP_X_CSRF_TOKEN'])) $sent = $_SERVER['HTTP_X_CSRF_TOKEN'];
 
@@ -122,5 +127,3 @@ class Guard
         errorMsgPage('You do not have access to that page.');
     }
 }
-
-$_guard = new Guard();

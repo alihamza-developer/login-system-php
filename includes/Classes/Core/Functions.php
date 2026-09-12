@@ -1,12 +1,10 @@
 <?php
 
-namespace FN;
+namespace Core;
 
 class Functions
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
     private $file_extensions_mapping = [
         "video/*" => ".webm,.ogm,.ogv,.asx,.mpg,.mp2,.mpeg,.mpe,.mpv,.ogg,.mp4,.m4p,.m4v.avi,.wmv,.mov,.qt,.flv,.swf",
         "image/*" => ".jpg,.jpeg,.png,.gif,.bmp,.tiff,.svg"
@@ -215,5 +213,3 @@ class Functions
         return $result;
     }
 }
-
-$_fn = new Functions();

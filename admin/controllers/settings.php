@@ -1,9 +1,9 @@
 <?php
+
+use Core\App;
+
 define('DIR', '../');
 require_once('../includes/db.php');
-
-# Every post must carry the csrf token
-$_guard->verify_csrf();
 
 // Save mail settings
 if (isset($_POST['save_settings'])) {
@@ -21,6 +21,6 @@ if (isset($_POST['save_settings'])) {
 	$smtp_pass = _POST('smtp_pass', ['default' => '']);
 	if ($smtp_pass !== '') $values['smtp_pass'] = $smtp_pass;
 
-	$_settings->set_many($values);
+	App::settings()->set_many($values);
 	returnSuccess('Settings saved');
 }

@@ -146,7 +146,9 @@ function js_msg($type, $msg, $heading = null)
     $options = [
         'type' => $type
     ];
-    return "sAlert('$msg', '$heading', " . json_encode($options) . ")";
+    # Quotes and tags stay inside the string
+    $flags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP;
+    return "sAlert(" . json_encode($msg, $flags) . ", " . json_encode($heading, $flags) . ", " . json_encode($options) . ")";
 }
 // Is Image File
 function is_image_file($file_name)

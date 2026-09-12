@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 class Delete
 {
     public $actions = [],
@@ -11,8 +13,7 @@ class Delete
     // Constructor
     public function __construct($data = [])
     {
-        global $db;
-        $this->db = $db;
+        $this->db = App::db();
         $fn = function () {
             return true;
         };
@@ -95,5 +96,3 @@ class Delete
             $this->callback("error");
     }
 }
-
-$_delete = new Delete();

@@ -1,6 +1,6 @@
 <?php
 define('_DIR_', '../');
-require_once "inc/database.php";
+require_once "core.php";
 
 @mkdir(UPLOAD_PATH);
 
@@ -91,6 +91,23 @@ $db->query("CREATE TABLE IF NOT EXISTS `auth_attempts` (
     `attempted_at` timestamp NOT NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
     KEY `idx_lookup` (`identifier`, `attempted_at`)
+  ) ENGINE=InnoDB;");
+
+# Guests Table - identity for visitors with no account
+$db->query("CREATE TABLE IF NOT EXISTS `guests` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `token_hash` char(64) NOT NULL,
+    `ip` varchar(45) DEFAULT NULL,
+    `user_agent` varchar(255) DEFAULT NULL,
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `last_seen_at` timestamp NOT NULL DEFAULT current_timestamp(),
+    `expires_at` datetime NOT NULL,
+    `merged_at` timestamp NULL DEFAULT NULL,
+    `merged_user_id` int(11) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_guest_token` (`token_hash`),
+    KEY `idx_guest_expiry` (`expires_at`),
+    KEY `idx_guest_merged` (`merged_user_id`)
   ) ENGINE=InnoDB;");
 
 # Cron Table

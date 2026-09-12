@@ -1,4 +1,7 @@
 <?php
+
+use Core\App;
+
 $VERIFY_LOGIN = true;
 $page_name = 'Login';
 require_once "includes/db.php";
@@ -6,8 +9,8 @@ $CSS_FILES_[] = 'authorize.css';
 require_once "includes/head.php";
 
 # Verify User
-if (isset($_GET['verify']) && isset($_GET['token'])) {
-    $res = verifyUserWithToken($_GET['token']);
+if (isset($_GET['verify']) && isset($_GET['token']) && isset($_GET['email'])) {
+    $res = App::auth()->verify_email($_GET['email'], $_GET['token']);
     $res = json_decode($res, true);
     $SCRIPT_ = js_msg($res['status'], $res['data']);
 }

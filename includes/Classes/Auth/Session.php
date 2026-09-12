@@ -2,6 +2,8 @@
 
 namespace Auth;
 
+use Core\App;
+
 class Session
 {
     private $db;
@@ -11,8 +13,7 @@ class Session
     # Constructor
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = App::db();
     }
 
     # Cookie name
@@ -247,5 +248,3 @@ class Session
         ]);
     }
 }
-
-$_session = new Session();

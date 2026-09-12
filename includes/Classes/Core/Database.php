@@ -1,12 +1,11 @@
 <?php
 
-namespace DB;
+namespace Core;
 
-require_once("config.php");
-require_once("functions.php");
 class Database
 {
 	private $update_uid_length = 20;
+	private static $link;
 	public $conn;
 	public $insert_uid;
 
@@ -20,19 +19,29 @@ class Database
 	# Connect To Database
 	private function connect()
 	{
+		# One link per request, every instance shares it
+		if (self::$link) {
+			$this->conn = self::$link;
+			return;
+		}
+
 		$this->conn = @new \mysqli(DB_HOST, DB_USER, DB_PASSWORD);
 		if ($this->conn->connect_error) {
 			die("Connection Error " . $this->conn->connect_error);
 		}
-		$db_selected = $this->conn->select_db(DB_NAME);
-		if (!$db_selected) {
-			$db_created = $this->conn->query('CREATE DATABASE ' . DB_NAME);
-			if ($db_created === TRUE) {
+		# Mysqli throws on a missing database
+		try {
+			$this->conn->select_db(DB_NAME);
+		} catch (\mysqli_sql_exception $error) {
+			try {
+				$this->conn->query('CREATE DATABASE `' . DB_NAME . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci');
 				$this->conn->select_db(DB_NAME);
-			} else {
+			} catch (\mysqli_sql_exception $error) {
 				die('Error Creating Database');
 			}
 		}
+
+		self::$link = $this->conn;
 	}
 
 	# Validation
@@ -389,9 +398,3 @@ class Database
 		return $action;
 	}
 }
-$db = new Database();
-
-require_once("functions2.php");
-require_once(_DIR_ . "includes/Classes/Settings.php");
-require_once("globals.php");
-require_once("site-setting.php");

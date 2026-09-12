@@ -2,9 +2,6 @@
 define('DIR', '../');
 require_once('../includes/db.php');
 
-# Every post must carry the csrf token
-$_guard->verify_csrf();
-
 require_once _DIR_ . 'cron/includes/Cron.php';
 require_once _DIR_ . 'cron/includes/tasks.php';
 

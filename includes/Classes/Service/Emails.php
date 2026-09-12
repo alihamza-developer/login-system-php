@@ -1,10 +1,9 @@
 <?php
 
-namespace Email;
+namespace Service;
 
-use \DB\Database;
-
-require_once _DIR_ . "includes/inc/emails-data.php";
+use Core\App;
+use Core\Database;
 
 class Emails extends Database
 {
@@ -15,8 +14,7 @@ class Emails extends Database
     # Constructor
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = App::db();
         $this->base_file = "base-structure";
         $this->base_vars = [
             'site_name' => SITE_NAME,
@@ -42,23 +40,16 @@ class Emails extends Database
     }
 
     # Get template from file
-    function get_template($name)
+    function get_template($name, $vars = [])
     {
-        if (!isset(EMAILS[$name])) return null;
         $file = TEMPLATES_PATH . "{$name}.html";
         if (!is_file($file)) return null;
-        return file_get_contents($file);
-    }
 
-    # Read Template file
-    public function read_template_file($str, $vars = [])
-    {
-        $email_body = $this->replace_vars($str, $vars);
-        $vars['email_body'] = $email_body;
+        # Body, then base structure
+        $vars['email_body'] = $this->replace_vars(file_get_contents($file), $vars);
+        $base = file_get_contents(TEMPLATES_PATH . "{$this->base_file}.html");
 
-        // Get Email Structure
-        $file_data = $this->replace_vars($this->get_template($this->base_file), $vars, true);
-        return $file_data;
+        return $this->replace_vars($base, $vars, true);
     }
 
     # Get User Data
@@ -77,47 +68,32 @@ class Emails extends Database
     # Send Email
     public function send($options)
     {
+        $return_html = arr_val($options, 'return_html');
         $template = arr_val($options, 'template');
+        $subject = arr_val($options, 'subject');
+        $vars = arr_val($options, 'vars', []);
         $to = $options['to'];
+
         if (!$template) return false;
 
-        if (!isset(EMAILS[$template])) return;
+        $user = $this->get_user_data($to);
+        $vars = array_merge($vars, $user); # User Info
+        $vars = array_merge($vars, $this->base_vars); # Base Variables
 
-        if ($template === $this->base_file) return;
+        $html = $this->get_template($template, $vars);
 
-        $name = $template;
-        $template = EMAILS[$template];
-        $body = $this->get_template($name);
-        if (!$body) return;
+        if ($return_html) return $html;
 
-        $subject = arr_val($template, 'subject', SITE_NAME);
-
-        $vars = arr_val($options, 'vars', []);
-
-        # Merge Base Variables Global
-        $vars = array_merge($vars, $this->base_vars);
-
-        # Merge User Variables
-        $vars = array_merge($vars, $this->get_user_data($to));
-
-
-        # Read Template File
-        $body = $this->read_template_file($body, $vars);
-        $subject_ = $this->replace_vars($subject, $vars);
-
-        // Return Html
-        if (arr_val($options, 'return_html', false)) return $body;
-
-        // Send Email
-        return $this->sendEmailTo([
+        return $this->send_email_to([
             'to' => $to,
-            'body' => $body,
-            'subject' => $subject_
+            'body' => $html,
+            'subject' => $subject,
+            'to_name' => arr_val($user, 'name', '')
         ]);
     }
 
     # Send Email Main Function
-    public function sendEmailTo($data)
+    public function send_email_to($data)
     {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
@@ -149,5 +125,3 @@ class Emails extends Database
         }
     }
 }
-$_email = new Emails();
-require_once _DIR_ . "includes/inc/emails.php";

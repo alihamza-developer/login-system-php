@@ -1,5 +1,17 @@
 {
     "require": {
         "phpmailer/phpmailer": "^7.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "includes/Classes/Core/",
+            "Auth\\": "includes/Classes/Auth/",
+            "Service\\": "includes/Classes/Service/"
+        }
     }
 }

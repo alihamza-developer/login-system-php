@@ -2,6 +2,8 @@
 
 namespace Auth;
 
+use Core\App;
+
 class Settings
 {
     private $db;
@@ -10,8 +12,7 @@ class Settings
     # Constructor
     public function __construct()
     {
-        global $db;
-        $this->db = $db;
+        $this->db = App::db();
     }
 
     # Keys held encrypted
@@ -20,7 +21,6 @@ class Settings
         return defined('SETTINGS_SECRETS') && in_array($key, SETTINGS_SECRETS);
     }
 
-    # Load all
     # Load all
     public function all()
     {
@@ -124,5 +124,3 @@ class Settings
         return $plain === false ? '' : $plain;
     }
 }
-
-$_settings = new Settings();

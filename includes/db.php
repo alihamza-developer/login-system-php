@@ -1,23 +1,30 @@
 <?php
-if (!defined('DIR')) define('DIR', './');
-if (!defined('_DIR_')) define('_DIR_', DIR);
-require_once("inc/database.php");
-require_once "Classes/Functions.php";
-require_once "Classes/Extension.php";
-require_once "Classes/Emails.php";
-require_once "Classes/Session.php";
-require_once "Classes/Auth.php";
-require_once "Classes/Token.php";
-require_once "Classes/Guard.php";
-require_once _DIR_ . "vendor/autoload.php";
+
+use Core\App;
+
+require_once __DIR__ . '/core.php';
+
 $timestamp = date('Y-m-d h:i:s');
 
+# helpers
+$_fn      = App::functions();
 
-$VERIFY_LOGIN = isset($VERIFY_LOGIN) ? $VERIFY_LOGIN : false;
+# Auth + Guest
+$_session = App::session();
+$_token   = App::token();
+$_auth    = App::auth();
+$_guard   = App::guard();
+$_guest   = App::guest();
+$_settings = App::settings();
 
+# User + Guest Info
 define('LOGGED_IN_USER', $_auth->user());
-define('LOGGED_IN_USER_ID', $_auth->id());
+define('LOGGED_IN_USER_ID', LOGGED_IN_USER ? LOGGED_IN_USER['id'] : null);
+define('IS_ADMIN', $_auth->is("admin"));
+define('GUEST_ID', $_guest->boot(LOGGED_IN_USER_ID)); # Guest Id
 
-if (!is_null(LOGGED_IN_USER) && $VERIFY_LOGIN) redirectTo('user/dashboard');
+# CSRF
+$_guard->csrf_token(); # Set CSRF Token Cookie
+$_guard->verify_csrf();  # Every POST, wherever it lands
 
-define('IS_ADMIN', $_auth->is('admin'));
+@define("DIR_TYPE", 'frontend');

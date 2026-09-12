@@ -1,20 +1,19 @@
 <?php
+
+use Core\App;
+
 define('DIR', '../');
 require_once(DIR . 'includes/db.php');
 
-# Every post must carry the csrf token
-$_guard->verify_csrf();
-require_once _DIR_ . "includes/Classes/Emails.php";
-// Sign Up
+# Register New User
 if (isset($_POST['register_new_user'])) {
-	$fname      = _POST('fname', ['default' => '']);
-	$lname      = _POST('lname', ['default' => '']);
+	$fname      = _POST('fname');
+	$lname      = _POST('lname');
 	$name       = trim("$fname $lname");
-	$email      = _POST('email', ['default' => '']);
-	$password   = _POST('password', ['default' => '']);
-	$c_password = _POST('c_password', ['default' => '']);
+	$email      = _POST('email');
+	$password   = _POST('password');
+	$c_password = _POST('c_password');
 
-	if ($fname === '') returnError('First name is required');
 	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) returnError('Enter a valid email address');
 	if (strlen($password) < AUTH_PASSWORD_MIN) returnError('Password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
 	if ($password !== $c_password) returnError('Passwords do not match');
@@ -22,7 +21,7 @@ if (isset($_POST['register_new_user'])) {
 	$check = $db->select_one("users", '*', ['email' => $email]);
 	if ($check) returnError('Email Already Exists. Go to Log In Page');
 
-	$add_user = $db->insert('users', [
+	$user = $db->insert('users', [
 		'fname' => $fname,
 		'lname' => $lname,
 		'name' => $name,
@@ -32,16 +31,14 @@ if (isset($_POST['register_new_user'])) {
 		'verify_status' => 0,
 		'date_added' => $timestamp
 	]);
-	if (!$add_user) returnError('We could not create your account. Please try again.');
+	if (!$user) returnError('We could not create your account. Please try again.');
 
-	# The account exists either way, so say which happened
-	$sent = json_decode(sendVerifyToken($email), true);
-	if (arr_val($sent, 'status') !== 'success')
-		returnError('Your account was created, but we could not send the verification email. Try signing in to request a new link.');
-
-	echo success('We sent a verfication link to your email. Please Verify your account');
+	$response = App::auth()->send_verify_token($email);
+	echo $response;
+	die();
 }
-// Login
+
+# Login User
 if (isset($_POST['login'])) {
 	$email    = _POST('email');
 	$password = _POST('password');
@@ -68,7 +65,7 @@ if (isset($_POST['login'])) {
 	}
 
 	# The admin form only accepts admins
-	$admin_only = _POST('require_admin', ['default' => '']) !== '';
+	$admin_only = _POST('require_admin') !== '';
 	if ($admin_only && $user['role'] !== 'admin') {
 		$_guard->hit($key_user);
 		$_guard->hit($key_ip);
@@ -78,7 +75,7 @@ if (isset($_POST['login'])) {
 	$_guard->clear($key_user);
 	$_guard->clear($key_ip);
 
-	$remember = _POST('remember', ['default' => '']) !== '';
+	$remember = _POST('remember') !== '';
 	if (!$_auth->login($user['id'], $remember))
 		returnError('We could not sign you in. Please try again.');
 
@@ -86,65 +83,64 @@ if (isset($_POST['login'])) {
 		'redirect' => $admin_only ? url('admin/dashboard') : 'user/dashboard'
 	]);
 }
-// Send Reset Password Link
+
+# Send Reset Password Link
 if (isset($_POST['send_reset_password_link'])) {
-	$email = _POST('email', ['default' => '']);
+	$email = _POST('email');
 
-	# Same reply either way, so the form cannot be used to find accounts
-	$generic = 'If that address has an account, a reset link is on its way.';
-
-	# Cap reset emails per address, same reply either way
+	# Cap reset emails per address
 	$reset_key = 'reset:' . strtolower($email);
-	if (!$_guard->throttle($reset_key, 3, 3600)) returnSuccess($generic);
+	if (!$_guard->throttle($reset_key, 3, 3600))
+		returnError('Too many reset requests. Please try again later.');
 	$_guard->hit($reset_key);
 
-	$user = $db->select_one('users', 'id,email,verify_status', ['email' => $email]);
-	if (!$user) returnSuccess($generic);
-	if ($user['verify_status'] != 1) returnSuccess($generic);
+	$user = $db->select_one('users', '*', ['email' => $email]);
+
+	if (!$user) returnError("You've entered the incorrect email address. Please try again.");
+
+	# Check Verification
+	$is_verified = $user['verify_status'] == 1;
+
+	if (!$is_verified) returnError("Your account is not verified. First verify you account. <a href='action?type=verifyEmail&email={$email}'>Click here to resend</a>", [
+		'html' => true
+	]);
 
 	# Any earlier link stops working
 	$_token->revoke_all('reset', $user['id']);
-	$raw = $_token->create('reset', $user['id'], 3600);
-	if (!$raw) returnError('We could not create a reset link. Please try again.');
+	$forgot_token = $_token->create('reset', $user['id'], 86400);
 
-	$_email->send([
-		'template' => 'forgot-email',
-		'to' => $email,
-		'vars' => [
-			'token' => $raw,
-			'to' => $email,
-		]
-	]);
-	returnSuccess($generic);
+	if (!$forgot_token) returnError("Something wen't wrong!");
+
+	App::auth()->send_reset_token($email, $forgot_token);
+	returnSuccess('Reset Password link sent to your email. You can reset the password with in 24 hours');
 }
-// Reset Password
+
+# Reset Password
 if (isset($_POST['reset_password'])) {
-	$token            = _POST('token', ['default' => '']);
-	$new_password     = _POST('new_password', ['default' => '']);
-	$confirm_password = _POST('confirm_password', ['default' => '']);
+
+	$token = _POST('token');
+	$new_password = _POST('new_password');
+	$confirm_password = _POST('confirm_password');
 
 	if (strlen($new_password) < AUTH_PASSWORD_MIN)
 		returnError('Password must be at least ' . AUTH_PASSWORD_MIN . ' characters');
 
-	if ($new_password !== $confirm_password)
-		returnError('Password is not matching');
+	if ($new_password !== $confirm_password) returnError('Password is not matching.');
 
 	$row = $_token->verify('reset', $token);
-	if (!$row)
-		returnError('That reset link is invalid or has expired. Please request a new one.');
+	if (!$row) returnError("That reset link is invalid or has expired. Please request a new one.");
 
 	$update = $db->update('users', [
 		'password' => password_hash($new_password, AUTH_PASSWORD_ALGO),
 	], ['id' => $row['user_id']], ['encodeHtml' => false]);
 
-	if (!$update)
-		returnError('We could not change your password. Please try again.');
+	if (!$update) returnError("We could not change your password. Please try again.");
 
 	# Burn the link and sign out every device
 	$_token->consume($row['id']);
 	$_session->revoke_all($row['user_id']);
 
-	returnSuccess('Password changed successfully', [
-		'redirect' => 'login?success=Password changed successfully'
+	returnSuccess("Password changed successfully", [
+		'redirect' => 'login'
 	]);
 }

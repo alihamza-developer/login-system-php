@@ -10,11 +10,11 @@ define("SITE_EMAIL", "alihamzaofficial3536@gmail.com");
 define("CONTACT_EMAIL", SITE_EMAIL);
 
 # Mail (SMTP)
-define('SMTP_HOST', $_settings->get('smtp_host', ''));
-define('SMTP_PORT', $_settings->get('smtp_port', 587));
-define('SMTP_USER', $_settings->get('smtp_user', ''));
-define('SMTP_PASS', $_settings->get('smtp_pass', ''));
-define('SMTP_SECURE', $_settings->get('smtp_secure', 'tls'));
+define('SMTP_HOST', Core\App::settings()->get('smtp_host', ''));
+define('SMTP_PORT', Core\App::settings()->get('smtp_port', 587));
+define('SMTP_USER', Core\App::settings()->get('smtp_user', ''));
+define('SMTP_PASS', Core\App::settings()->get('smtp_pass', ''));
+define('SMTP_SECURE', Core\App::settings()->get('smtp_secure', 'tls'));
 
 # Folder paths
 define('USERS_PATH', _DIR_ . 'images/users/');
@@ -30,5 +30,6 @@ define('TABLES_WITHOUT_UID', [
     'sessions',
     'auth_tokens',
     'auth_attempts',
+    'guests',
     'cron_jobs'
 ]);

@@ -1,21 +1,25 @@
 <?php
-require_once("./includes/db.php");
 
+use Core\App;
+
+require_once("./includes/db.php");
 // Send Email
 if (isset($_GET['type'])) {
+    require_once _DIR_ . "vendor/autoload.php";
+
     $type = _GET('type');
     $email = _GET('email');
 
-    # Only verify emails resend
-    if ($type !== 'verify-email') errorMsgPage("That link is not valid.");
+    $is_user_verified = $db->select_one("users", "id", ['email' => $email, 'verify_status' => 1]);
+    if ($is_user_verified) {
+        showMsgPage([
+            'type' => 'warning',
+            'msg' => 'Your account is already verified.'
+        ]);
+    }
 
-    # Cap resends per address
-    $resend_key = 'resend:' . strtolower($email);
-    if (!$_guard->throttle($resend_key, 3, 3600))
-        errorMsgPage("You have requested too many links. Please try again later.");
-    $_guard->hit($resend_key);
-
-    $res = sendVerifyToken($email);
+    // Send Email
+    $res = App::auth()->send_verify_token($email);
     $res = json_decode($res, true);
     if ($res['status'] === "success") $res['status'] = "warning";
     showMsgPage([

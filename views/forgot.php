@@ -1,6 +1,5 @@
 <?php
 require_once('includes/db.php');
-require_once _DIR_ . "includes/Classes/Emails.php";
 $page_name = 'Reset Password';
 $reset_password = false;
 
