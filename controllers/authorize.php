@@ -65,7 +65,7 @@ if (isset($_POST['login'])) {
 	}
 
 	# The admin form only accepts admins
-	$admin_only = _POST('require_admin') !== '';
+	$admin_only = _POST('require_admin', ['default' => '']) !== '';
 	if ($admin_only && $user['role'] !== 'admin') {
 		$_guard->hit($key_user);
 		$_guard->hit($key_ip);
@@ -75,7 +75,7 @@ if (isset($_POST['login'])) {
 	$_guard->clear($key_user);
 	$_guard->clear($key_ip);
 
-	$remember = _POST('remember') !== '';
+	$remember = _POST('remember', ['default' => '']) !== '';
 	if (!$_auth->login($user['id'], $remember))
 		returnError('We could not sign you in. Please try again.');
 
